@@ -1,0 +1,15 @@
+PROJECT(xor_eval) 
+
+INCLUDE_DIRECTORIES(
+    Inc
+)
+
+FILE(GLOB SOURCES 
+    "Src/*.cpp"
+)
+
+FILE(GLOB HEADERS
+    "Inc/*.hpp"
+)
+
+ADD_LIBRARY(${PROJECT_NAME} ${HEADERS} ${SOURCES})
