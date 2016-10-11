@@ -1,8 +1,22 @@
 #pragma once
 
-struct Gene
+#include <memory>
+#include <functional>
+
+#include "RandomGenerator.hpp"
+
+class Gene
 {
-    bool is_enabled_ = true;
-    unsigned weight_ = 0;
-    unsigned innovation_ = 0;
+public:
+    bool is_enabled();
+    float weight();
+    unsigned innovation();
+    static std::unique_ptr<Gene, std::function<void(Gene*)>> create(const RandomGenerator&);
+
+private:
+    Gene();
+    ~Gene();
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
+
 };
