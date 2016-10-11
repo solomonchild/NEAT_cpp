@@ -34,7 +34,7 @@ struct Genome::Impl
     void mutate(const RandomGenerator& generator)
     {
 //        float p_of_node_mutate = generator.get_next(1);
-        //float p_of_link_mutate = generator.get_next(1);
+//        float p_of_link_mutate = generator.get_next(1);
 //        float p_of_point_mutate = generator.get_next(1);
 //        float p_of_enable_disable_mutate = generator.get_next(1);
     }
