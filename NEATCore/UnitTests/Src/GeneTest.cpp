@@ -40,16 +40,16 @@ private:
 TEST(GeneTest, ConstructGeneWithPredictableGenerator)
 {
     PredictableGenerator generator;
-    std::vector<decltype(Gene::create(generator))> genes;
+    std::vector<Gene> genes;
     for(unsigned i = 0; i < 10; ++i)
     {
-        genes.push_back(std::move(Gene::create(generator)));
+        genes.push_back(Gene(generator));
     }
 
     size_t i = 0;
     for(auto& it : genes)
     {
-        ASSERT_TRUE(it->is_enabled());
-        ASSERT_EQ(nums[i++], it->weight());
+        ASSERT_TRUE(it.is_enabled());
+        ASSERT_EQ(nums[i++], it.weight());
     }
 }

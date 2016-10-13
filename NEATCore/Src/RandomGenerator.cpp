@@ -29,6 +29,15 @@ RandomGenerator::RandomGenerator()
 
 RandomGenerator::~RandomGenerator() = default;
 
+RandomGenerator::RandomGenerator(const RandomGenerator& other)
+{
+    this->impl_ = std::unique_ptr<Impl>(new Impl(*other.impl_));
+
+}
+
+
+
+
 float RandomGenerator::get_next(uint16_t rand_max) const
 {
     return impl_->get_next(rand_max);

@@ -10,11 +10,18 @@ public:
     static std::unique_ptr<Genome, std::function<void(Genome*)>> create(const RandomGenerator&);
 
     float compatibility_distance(const Genome&);
-    void mutate(const RandomGenerator&);
+    void mutate();
+
+    Genome(const RandomGenerator&);
+
+    Genome(const Genome&);
+    Genome& operator=(const Genome&);
+
+    Genome(Genome&&);
+    Genome& operator=(Genome&&);
+    ~Genome();
 
 private:
-    Genome();
-    ~Genome();
     struct Impl;
     std::unique_ptr<Impl> impl_;
 };

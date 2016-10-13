@@ -6,6 +6,7 @@ class RandomGenerator
 {
 public:
     RandomGenerator();
+    RandomGenerator(const RandomGenerator&);
     ~RandomGenerator();
 
     virtual float get_next(uint16_t rand_max = 1) const;

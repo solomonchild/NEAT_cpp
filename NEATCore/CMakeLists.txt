@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 PROJECT(neat_core) 
 
-ADD_DEFINITIONS(-std=c++11 -Wall -Werror)
+ADD_DEFINITIONS(-std=c++14 -Wall -Werror)
 
 FILE(GLOB HEADERS
    "Inc/*.hpp"

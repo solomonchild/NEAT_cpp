@@ -8,6 +8,16 @@
 class Gene
 {
 public:
+
+    Gene(const RandomGenerator&);
+
+    Gene(const Gene&);
+    Gene& operator=(const Gene&);
+
+    Gene(Gene&&);
+    Gene& operator=(Gene&&);
+    ~Gene();
+
     bool is_enabled() const;
     void is_enabled(bool);
 
@@ -24,11 +34,8 @@ public:
     void out(unsigned);
 
 
-    static std::unique_ptr<Gene, std::function<void(Gene*)>> create(const RandomGenerator&);
 
 private:
-    Gene();
-    ~Gene();
     struct Impl;
     std::unique_ptr<Impl> impl_;
 

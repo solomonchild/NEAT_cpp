@@ -7,9 +7,9 @@
 TEST(GenomeTest, CompatibilityTest)
 {
     RandomGenerator generator;
-    auto genome1 = Genome::create(generator);
-    auto genome2 = Genome::create(generator);
-    float distance = genome1->compatibility_distance(*genome2);
+    auto genome1 = Genome(generator);
+    auto genome2 = Genome(generator);
+    float distance = genome1.compatibility_distance(genome2);
     ASSERT_LE(0, distance);
 }
 

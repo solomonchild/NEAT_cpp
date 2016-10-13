@@ -10,14 +10,34 @@ struct Gene::Impl
 };
 
 
-Gene::Gene()
+Gene::Gene(const RandomGenerator&)
 :impl_(new Impl)
 {
 }
 
-Gene::~Gene()
+Gene::Gene(const Gene& other)
 {
+   this->impl_ = std::make_unique<Impl>(*other.impl_);
 }
+
+Gene& Gene::operator=(const Gene& other)
+{
+    this->impl_ = std::make_unique<Impl>(*other.impl_);
+    return *this;
+}
+
+Gene::Gene(Gene&& other)
+{
+    this->impl_ = std::make_unique<Impl>(std::move(*other.impl_));
+}
+
+Gene& Gene::operator=(Gene&& other)
+{
+    this->impl_ = std::make_unique<Impl>(std::move(*other.impl_));
+    return *this;
+}
+
+Gene::~Gene() = default;
 
 bool Gene::is_enabled() const
 {
@@ -67,15 +87,4 @@ void Gene::in(unsigned val)
 void Gene::out(unsigned val)
 {
     impl_->out_ = val;
-}
-
-std::unique_ptr<Gene, std::function<void(Gene*)>> Gene::create(const RandomGenerator& generator)
-{
-    auto del = [] (Gene* gen)
-    {
-        delete gen;
-    };
-    auto gene = std::unique_ptr<Gene, std::function<void(Gene*)>>(new Gene, del);
-    gene->impl_->weight_ = generator.get_next();
-    return gene;
 }
