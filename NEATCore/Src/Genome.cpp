@@ -1,6 +1,7 @@
 #include "Genome.hpp"
 
 #include <memory>
+#include "Parameters.hpp"
 
 
 struct Genome::Impl
@@ -33,10 +34,12 @@ struct Genome::Impl
 
     void mutate(const RandomGenerator& generator)
     {
-//        float p_of_node_mutate = generator.get_next(1);
-//        float p_of_link_mutate = generator.get_next(1);
-//        float p_of_point_mutate = generator.get_next(1);
-//        float p_of_enable_disable_mutate = generator.get_next(1);
+        // TODO: Probabilities of node, point and enable/disable mutations
+        float p_of_link_mutate = generator.get_next(1);
+        if(p_of_link_mutate <= Parameters::link_mutation_chance)
+        {
+            mutate_connection(generator);
+        }
     }
 };
 
