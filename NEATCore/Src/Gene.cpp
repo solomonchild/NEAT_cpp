@@ -1,4 +1,5 @@
 #include "Gene.hpp"
+#include <iostream>
 
 struct Gene::Impl
 {
@@ -7,12 +8,15 @@ struct Gene::Impl
     unsigned innovation_ = 0;
     unsigned in_ = 0;
     unsigned out_ = 0;
+
 };
+
 
 
 Gene::Gene(const RandomGenerator&)
 :impl_(new Impl)
 {
+    // TODO: pass generator to impl
 }
 
 Gene::Gene(const Gene& other)
@@ -87,4 +91,15 @@ void Gene::in(unsigned val)
 void Gene::out(unsigned val)
 {
     impl_->out_ = val;
+}
+
+std::ostream& operator<<(std::ostream& stream, const Gene& g)
+{
+   stream << "[Is enabled: "  << g.impl_->is_enabled_ << ", ";
+   stream << "weight: "  << g.impl_->weight_ << ", ";
+   stream << "innovation: "  << g.impl_->innovation_ << ", ";
+   stream << "in: "  << g.impl_->in_ << ", ";
+   stream << "out: "  << g.impl_->out_ << "]";
+   stream << "\n";
+   return stream;
 }

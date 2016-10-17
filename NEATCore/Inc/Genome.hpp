@@ -22,6 +22,7 @@ public:
     ~Genome();
 
 private:
+    friend std::ostream& operator<<(std::ostream& stream, const Genome& genome);
     struct Impl;
     std::unique_ptr<Impl> impl_;
 };

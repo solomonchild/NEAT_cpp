@@ -1,5 +1,6 @@
 #include "Genome.hpp"
 
+#include <iostream>
 #include <memory>
 #include <map>
 
@@ -9,11 +10,21 @@
 
 struct Genome::Impl
 {
-    std::map<int, Gene> genes_;
+    using Genes = std::map<int, Gene>;
+    Genes genes_;
 
     Impl(const RandomGenerator& generator)
         :generator_(generator)
     {
+        for (Genes::size_type i = 0; i < Parameters::inputs; ++i)
+        {
+            genes_.insert(std::make_pair(i, Gene(generator_)));
+        }
+
+        for (Genes::size_type i = Parameters::genome_size  - Parameters::outputs; i < Parameters::genome_size; ++i)
+        {
+            genes_.insert(std::make_pair(i, Gene(generator_)));
+        }
     }
 
     float compatibility_distance(const Genome& rhs)
@@ -90,4 +101,15 @@ void Genome::mutate()
 float Genome::compatibility_distance(const Genome& rhs)
 {
     return impl_->compatibility_distance(rhs);
+}
+
+std::ostream& operator<<(std::ostream& stream, const Genome& genome)
+{
+    for (auto i : genome.impl_->genes_)
+    {
+        stream << "At " << i.first << ": ";
+        stream << i.second;
+    }
+    stream << "\n";
+    return stream;
 }

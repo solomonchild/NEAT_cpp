@@ -36,6 +36,7 @@ public:
 
 
 private:
+    friend std::ostream& operator<<(std::ostream& stream, const Gene&);
     struct Impl;
     std::unique_ptr<Impl> impl_;
 

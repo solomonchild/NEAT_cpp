@@ -1,4 +1,7 @@
+#include <iostream>
+
 #include "Parameters.hpp"
+#include "Genome.hpp"
 
 
 
@@ -20,5 +23,9 @@ int main(int argc, char** argv)
     // assign each genome to species
     // for each species, cull genomes
     // breed each species(randomly select genomes to crossover and/or mutate)
+    RandomGenerator generator;
+    Genome genome(generator);
+    std::cout << "Created genome. Will output.\n";
+    std::cout << genome;
     return 0;
 }
