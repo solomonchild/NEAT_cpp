@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <memory>
-#include <map>
+#include <vector>
 
 #include "Parameters.hpp"
 #include "Gene.hpp"
@@ -10,20 +10,21 @@
 
 struct Genome::Impl
 {
-    using Genes = std::map<int, Gene>;
+    using Genes = std::vector<Gene>;
     Genes genes_;
 
     Impl(const RandomGenerator& generator)
         :generator_(generator)
     {
-        for (Genes::size_type i = 0; i < Parameters::inputs; ++i)
+        for (Genes::size_type output_index = Parameters::genome_size  - Parameters::outputs; output_index < Parameters::genome_size; ++output_index)
         {
-            genes_.insert(std::make_pair(i, Gene(generator_)));
-        }
-
-        for (Genes::size_type i = Parameters::genome_size  - Parameters::outputs; i < Parameters::genome_size; ++i)
-        {
-            genes_.insert(std::make_pair(i, Gene(generator_)));
+            for (Genes::size_type input_index = 0; input_index < Parameters::inputs; ++input_index)
+            {
+                Gene gene(generator_);
+                gene.in(input_index);
+                gene.out(output_index);
+                genes_.push_back(gene);
+            }
         }
     }
 
@@ -107,8 +108,7 @@ std::ostream& operator<<(std::ostream& stream, const Genome& genome)
 {
     for (auto i : genome.impl_->genes_)
     {
-        stream << "At " << i.first << ": ";
-        stream << i.second;
+        stream << i;
     }
     stream << "\n";
     return stream;

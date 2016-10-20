@@ -3,20 +3,25 @@
 
 struct Gene::Impl
 {
+    Impl(const RandomGenerator& generator)
+        :generator_(generator)
+        ,weight_(generator.get_next())
+    {
+    }
+
+    RandomGenerator generator_;
     bool is_enabled_ = true;
     float weight_ = 0.0f;
     unsigned innovation_ = 0;
     unsigned in_ = 0;
     unsigned out_ = 0;
-
 };
 
 
 
-Gene::Gene(const RandomGenerator&)
-:impl_(new Impl)
+Gene::Gene(const RandomGenerator& generator)
+:impl_(new Impl(generator))
 {
-    // TODO: pass generator to impl
 }
 
 Gene::Gene(const Gene& other)

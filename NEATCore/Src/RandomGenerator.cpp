@@ -16,7 +16,8 @@ struct RandomGenerator::Impl
         {
             throw new std::invalid_argument("Maximum random number must be larger than 0");
         }
-        return rand() % rand_max;
+        float next = rand() / static_cast<float>(RAND_MAX) * static_cast<float>(rand_max);
+        return next;
     }
 
 };
