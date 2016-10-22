@@ -1,6 +1,7 @@
 #include "Genome.hpp"
 
 #include <iostream>
+#include <algorithm>
 #include <memory>
 #include <vector>
 
@@ -15,6 +16,7 @@ struct Genome::Impl
 
     Impl(const RandomGenerator& generator)
         :generator_(generator)
+        , last_neuron_(Parameters::inputs)
     {
         for (Genes::size_type output_index = Parameters::genome_size  - Parameters::outputs; output_index < Parameters::genome_size; ++output_index)
         {
@@ -45,16 +47,97 @@ struct Genome::Impl
 
     void mutate_node()
     {
+       last_neuron_++;
+       auto gene = get_random_gene();
+       Gene gene1(gene);
+       Gene gene2(gene);
+       gene.is_enabled(false);
 
+       gene1.in(gene.in());
+       gene1.out(last_neuron_);
+       gene1.weight(1);
+
+       gene2.in(last_neuron_);
+       gene2.out(gene.out());
+       gene2.weight(gene.weight());
+
+       genes_.push_back(gene1);
+       genes_.push_back(gene2);
+
+    }
+
+    Gene& get_random_gene()
+    {
+        int index = generator_.get_next(genes_.size());
+        return genes_[index];
+    }
+
+    std::vector<unsigned> get_neurons()
+    {
+        // use set?
+        std::vector<unsigned> neurons;
+        for (auto g : genes_)
+        {
+            if(std::find(neurons.begin(), neurons.end(), g.in()) == neurons.end())
+            {
+                neurons.push_back(g.in());
+            }
+            if(std::find(neurons.begin(), neurons.end(), g.out()) == neurons.end())
+            {
+                neurons.push_back(g.out());
+            }
+        }
+        return neurons;
+    }
+
+    unsigned int get_random_neuron_number()
+    {
+        auto neurons = get_neurons();
+        int index = generator_.get_next(neurons.size());
+        return neurons[index];
+    }
+
+
+    bool contains_gene(const Gene& gene)
+    {
+        for (auto g : genes_)
+        {
+            if(g.in() == gene.in() && g.out() == gene.out())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     void mutate_connection()
     {
+        auto neuron1 = get_random_neuron_number();
+        auto neuron2 = get_random_neuron_number();
+        Gene gene(generator_);
+        gene.in(neuron1);
+        gene.out(neuron2);
+        gene.weight(generator_.get_next(2));
 
+        if(!contains_gene(gene))
+        {
+            genes_.push_back(gene);
+        }
+        else
+        {
+            std::cout << "CONTAINS!" << std::endl;
+            std::cout << gene << std::endl;
+        }
     }
 
     void mutate()
     {
+        float p_of_node_mutate = generator_.get_next(1);
+        if (p_of_node_mutate <= Parameters::node_mutation_chance)
+        {
+            mutate_node();
+        }
+
         // TODO: Probabilities of node, point and enable/disable mutations
         float p_of_link_mutate = generator_.get_next(1);
         if(p_of_link_mutate <= Parameters::link_mutation_chance)
@@ -64,6 +147,7 @@ struct Genome::Impl
     }
 
     RandomGenerator generator_;
+    unsigned int last_neuron_;
 };
 
 Genome::Genome(const RandomGenerator& generator)
@@ -106,9 +190,12 @@ float Genome::compatibility_distance(const Genome& rhs)
 
 std::ostream& operator<<(std::ostream& stream, const Genome& genome)
 {
-    for (auto i : genome.impl_->genes_)
+    for (auto g : genome.impl_->genes_)
     {
-        stream << i;
+        if(g.is_enabled())
+        {
+            stream << g;
+        }
     }
     stream << "\n";
     return stream;

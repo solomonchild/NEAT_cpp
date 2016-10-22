@@ -11,7 +11,8 @@ namespace Parameters
    const float weights_coeff = 0.4;
    const float distance_threshold = 1.0;
 
-   const float link_mutation_chance = 0.57;
+   const float link_mutation_chance = 0.97;
+   const float node_mutation_chance = 0.97;
 
    //TODO: carry out these to Evaluator
    const unsigned inputs = 2;

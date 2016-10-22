@@ -27,5 +27,7 @@ int main(int argc, char** argv)
     Genome genome(generator);
     std::cout << "Created genome. Will output.\n";
     std::cout << genome;
+    genome.mutate();
+    std::cout << genome;
     return 0;
 }
