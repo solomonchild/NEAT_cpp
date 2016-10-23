@@ -9,9 +9,24 @@
 #include "Gene.hpp"
 
 
+struct Neuron
+{
+    unsigned int index_;
+    Neuron(int idx)
+        :index_(idx)
+    {
+    }
+
+    operator int()
+    {
+        return index_;
+    }
+};
+
 struct Genome::Impl
 {
     using Genes = std::vector<Gene>;
+    using Neurons = std::vector<Neuron>;
     Genes genes_;
 
     Impl(const RandomGenerator& generator)
@@ -72,10 +87,9 @@ struct Genome::Impl
         return genes_[index];
     }
 
-    std::vector<unsigned> get_neurons()
+    Neurons get_neurons()
     {
-        // use set?
-        std::vector<unsigned> neurons;
+        Neurons neurons;
         for (auto g : genes_)
         {
             if(std::find(neurons.begin(), neurons.end(), g.in()) == neurons.end())
@@ -90,13 +104,12 @@ struct Genome::Impl
         return neurons;
     }
 
-    unsigned int get_random_neuron_number()
+    Neuron get_random_neuron()
     {
         auto neurons = get_neurons();
         int index = generator_.get_next(neurons.size());
         return neurons[index];
     }
-
 
     bool contains_gene(const Gene& gene)
     {
@@ -112,33 +125,28 @@ struct Genome::Impl
 
     void mutate_connection()
     {
-        auto neuron1 = get_random_neuron_number();
-        auto neuron2 = get_random_neuron_number();
+        auto neuron1 = get_random_neuron();
+        auto neuron2 = get_random_neuron();
         Gene gene(generator_);
-        gene.in(neuron1);
-        gene.out(neuron2);
+        gene.in(neuron1.index_);
+        gene.out(neuron2.index_);
         gene.weight(generator_.get_next(2));
 
         if(!contains_gene(gene))
         {
             genes_.push_back(gene);
         }
-        else
-        {
-            std::cout << "CONTAINS!" << std::endl;
-            std::cout << gene << std::endl;
-        }
     }
 
     void mutate()
     {
+        // TODO: Probabilities of point and enable/disable mutations
         float p_of_node_mutate = generator_.get_next(1);
         if (p_of_node_mutate <= Parameters::node_mutation_chance)
         {
             mutate_node();
         }
 
-        // TODO: Probabilities of node, point and enable/disable mutations
         float p_of_link_mutate = generator_.get_next(1);
         if(p_of_link_mutate <= Parameters::link_mutation_chance)
         {
