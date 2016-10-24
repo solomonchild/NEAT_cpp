@@ -4,16 +4,19 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
+#include <cassert>
 
 #include "Parameters.hpp"
 #include "Gene.hpp"
 
 
+using Genes = std::vector<Gene>;
+
 struct Neuron
 {
-    unsigned int index_;
     Neuron(int idx)
-        :index_(idx)
+    :index_(idx)
+        , value_(0.0f)
     {
     }
 
@@ -21,12 +24,15 @@ struct Neuron
     {
         return index_;
     }
+
+    unsigned int index_;
+    Genes input_;
+    float value_;
 };
 
+using Neurons = std::vector<Neuron>;
 struct Genome::Impl
 {
-    using Genes = std::vector<Gene>;
-    using Neurons = std::vector<Neuron>;
     Genes genes_;
 
     Impl(const RandomGenerator& generator)
@@ -154,6 +160,71 @@ struct Genome::Impl
         }
     }
 
+
+    Outputs evaluate_network(const Inputs& inputs)
+    {
+        std::vector<Neuron> network;
+        Outputs outputs;
+        Evaluator ev;
+
+        for(unsigned i = 0; i < ev.number_of_inputs_; ++i)
+        {
+            Neuron n(i);
+            n.value_ = inputs[i];
+            network.emplace_back(n);
+        }
+
+        for(unsigned i = 0; i < ev.number_of_outputs_; ++i)
+        {
+            network.emplace_back(Neuron(Parameters::genome_size + i));
+        }
+
+        Genes genes(genes_);
+
+        auto comp = [] (const Gene& g1, const Gene& g2)
+        {
+            return g1.out() < g2.out();
+        };
+
+        std::sort(genes.begin(), genes.end(), comp);
+        for (auto& g : genes)
+        {
+            auto out_predicate = [&g] (const Gene& gene)
+            {
+                    return g.out() == gene.out();
+            };
+
+            if (std::find_if(genes.begin(), genes.end(), out_predicate) == genes.end())
+            {
+                network.emplace_back(Neuron (g.out()));
+            }
+
+            {
+                auto it = std::find(network.begin(), network.end(), g.out());
+                assert(it != network.end());
+                Neuron& found_neuron = *it;
+                found_neuron.input_.push_back(g);
+            }
+
+            auto in_predicate = [&g] (const Gene& gene)
+            {
+                    return g.in() == gene.in();
+            };
+            if (std::find_if(genes.begin(), genes.end(), in_predicate) == genes.end())
+            {
+                Neuron n(g.in());
+                network.emplace_back(n);
+            }
+        }
+
+        for(auto& n : network)
+        {
+            // TODO: calculate
+            (void)n;
+        }
+        return outputs;
+    }
+
     RandomGenerator generator_;
     unsigned int last_neuron_;
 };
@@ -184,6 +255,12 @@ Genome& Genome::operator=(Genome&& other)
 {
     this->impl_ = std::make_unique<Impl>(std::move(*other.impl_));
     return *this;
+}
+
+
+Outputs Genome::evaluate_network(const Inputs& inputs)
+{
+    return impl_->evaluate_network(inputs);
 }
 
 void Genome::mutate()

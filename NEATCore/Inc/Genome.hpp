@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "RandomGenerator.hpp"
+#include "Evaluator.hpp"
 
 class Genome
 {
@@ -11,6 +12,8 @@ public:
 
     float compatibility_distance(const Genome&);
     void mutate();
+
+    Outputs evaluate_network(const Inputs&);
 
     Genome(const RandomGenerator&);
 
