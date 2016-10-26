@@ -2,6 +2,7 @@
 
 #include <ctime>
 #include <cstdlib>
+#include <iostream>
 
 struct RandomGenerator::Impl
 {
@@ -32,10 +33,8 @@ RandomGenerator::~RandomGenerator() = default;
 
 RandomGenerator::RandomGenerator(const RandomGenerator& other)
 {
-    this->impl_ = std::unique_ptr<Impl>(new Impl(*other.impl_));
-
+    this->impl_ = std::make_unique<Impl>(*other.impl_);
 }
-
 
 
 

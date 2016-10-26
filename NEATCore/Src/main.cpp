@@ -12,7 +12,7 @@ int main(int argc, char** argv)
     // assign each genome to species
     // for each species, cull genomes
     // breed each species(randomly select genomes to crossover and/or mutate)
-    RandomGenerator generator;
+    std::shared_ptr<RandomGenerator> generator = std::make_shared<RandomGenerator>();
     std::vector<Genome> population;
     for(unsigned int i = 0; i < Parameters::population_size; ++i)
     {

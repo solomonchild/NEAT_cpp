@@ -10,7 +10,6 @@
 #include "Gene.hpp"
 
 
-using Genes = std::vector<Gene>;
 
 struct Neuron
 {
@@ -26,16 +25,14 @@ struct Neuron
     }
 
     unsigned int index_;
-    Genes input_;
+    Genome::Genes input_;
     float value_;
 };
 
 using Neurons = std::vector<Neuron>;
 struct Genome::Impl
 {
-    Genes genes_;
-
-    Impl(const RandomGenerator& generator)
+    Impl(std::shared_ptr<RandomGenerator> generator)
         :generator_(generator)
         , last_neuron_(Parameters::inputs)
     {
@@ -50,6 +47,13 @@ struct Genome::Impl
             }
         }
     }
+    Impl(std::shared_ptr<RandomGenerator> generator, const Genes& genes)
+        :generator_(generator)
+        , last_neuron_(Parameters::inputs)
+        , genes_(genes)
+    {
+    }
+
 
     float compatibility_distance(const Genome& rhs)
     {
@@ -69,7 +73,7 @@ struct Genome::Impl
     void mutate_node()
     {
        last_neuron_++;
-       auto gene = get_random_gene();
+       auto& gene = get_random_gene();
        Gene gene1(gene);
        Gene gene2(gene);
        gene.is_enabled(false);
@@ -89,7 +93,7 @@ struct Genome::Impl
 
     Gene& get_random_gene()
     {
-        int index = generator_.get_next(genes_.size());
+        int index = generator_->get_next(genes_.size());
         return genes_[index];
     }
 
@@ -113,7 +117,7 @@ struct Genome::Impl
     Neuron get_random_neuron()
     {
         auto neurons = get_neurons();
-        int index = generator_.get_next(neurons.size());
+        int index = generator_->get_next(neurons.size());
         return neurons[index];
     }
 
@@ -136,7 +140,7 @@ struct Genome::Impl
         Gene gene(generator_);
         gene.in(neuron1.index_);
         gene.out(neuron2.index_);
-        gene.weight(generator_.get_next(2));
+        gene.weight(generator_->get_next(2));
 
         if(!contains_gene(gene))
         {
@@ -147,13 +151,13 @@ struct Genome::Impl
     void mutate()
     {
         // TODO: Probabilities of point and enable/disable mutations
-        float p_of_node_mutate = generator_.get_next(1);
+        float p_of_node_mutate = generator_->get_next(1);
         if (p_of_node_mutate <= Parameters::node_mutation_chance)
         {
             mutate_node();
         }
 
-        float p_of_link_mutate = generator_.get_next(1);
+        float p_of_link_mutate = generator_->get_next(1);
         if(p_of_link_mutate <= Parameters::link_mutation_chance)
         {
             mutate_connection();
@@ -163,6 +167,7 @@ struct Genome::Impl
 
     Outputs evaluate_network(const Inputs& inputs)
     {
+        // TODO: add sigmoid
         std::vector<Neuron> network;
         Outputs outputs;
         Evaluator ev;
@@ -225,13 +230,15 @@ struct Genome::Impl
         return outputs;
     }
 
-    RandomGenerator generator_;
+    std::shared_ptr<RandomGenerator> generator_;
     unsigned int last_neuron_;
+    Genes genes_;
 };
 
-Genome::Genome(const RandomGenerator& generator)
-    :impl_(new Impl(generator))
+Genome::Genome(std::shared_ptr<RandomGenerator> generator, const Genes& genes)
+    :impl_(new Impl(generator, genes))
 {}
+
 
 Genome::~Genome() = default;
 

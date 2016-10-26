@@ -9,10 +9,11 @@ class Gene
 {
 public:
 
-    Gene(const RandomGenerator&);
 
+    Gene();
     Gene(const Gene&);
     Gene& operator=(const Gene&);
+    Gene(std::shared_ptr<RandomGenerator>);
 
     Gene(Gene&&);
     Gene& operator=(Gene&&);

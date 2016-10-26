@@ -39,7 +39,7 @@ private:
 
 TEST(GeneTest, ConstructGeneWithPredictableGenerator)
 {
-    PredictableGenerator generator;
+    std::shared_ptr<PredictableGenerator> generator = std::make_shared<PredictableGenerator>();
     std::vector<Gene> genes;
     for(unsigned i = 0; i < 10; ++i)
     {

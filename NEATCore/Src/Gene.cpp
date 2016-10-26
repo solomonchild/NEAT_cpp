@@ -3,13 +3,17 @@
 
 struct Gene::Impl
 {
-    Impl(const RandomGenerator& generator)
-        :generator_(generator)
-        ,weight_(generator.get_next())
+    Impl(std::shared_ptr<RandomGenerator> generator)
+        :generator_(new RandomGenerator(*generator))
+        ,weight_(generator->get_next())
     {
     }
 
-    RandomGenerator generator_;
+    Impl()
+    {
+    }
+
+    std::shared_ptr<RandomGenerator> generator_;
     bool is_enabled_ = true;
     float weight_ = 0.0f;
     unsigned innovation_ = 0;
@@ -19,7 +23,12 @@ struct Gene::Impl
 
 
 
-Gene::Gene(const RandomGenerator& generator)
+Gene::Gene()
+    :impl_(new Impl)
+{
+}
+
+Gene::Gene(std::shared_ptr<RandomGenerator> generator)
 :impl_(new Impl(generator))
 {
 }
