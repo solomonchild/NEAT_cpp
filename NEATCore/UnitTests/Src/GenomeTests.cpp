@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "Genome.hpp"
+#include "Parameters.hpp"
 
 
 
@@ -51,10 +52,18 @@ TEST(GenomeTest, EvaluateNetworkTest)
 
     };
     auto generator = std::make_shared<PredictableGenerator>();
-    Gene gene;
-    Genome genome(generator, {gene});
-    std::cout << genome << std::endl;
-    genome.mutate();
-    std::cout << genome << std::endl;
+    Gene gene1;
+    Gene gene2;
+    gene1.weight(0.5);
+    gene2.weight(0.3);
+    gene1.in(0);
+    gene1.out(Parameters::genome_size);
+    gene2.in(1);
+    gene2.out(Parameters::genome_size);
+
+    Genome genome(generator, {gene1, gene2});
+    Outputs expected_outputs = {0.96108983};
+    auto outputs = genome.evaluate_network({1, 1});
+    ASSERT_FLOAT_EQ(expected_outputs[0], outputs[0]);
 
 }

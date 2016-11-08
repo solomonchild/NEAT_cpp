@@ -9,6 +9,8 @@
 #include "Parameters.hpp"
 #include "Gene.hpp"
 
+#define DEBUG(x, ...) printf(x"\n", ##__VA_ARGS__)
+
 
 
 struct Neuron
@@ -167,20 +169,31 @@ struct Genome::Impl
 
     Outputs evaluate_network(const Inputs& inputs)
     {
+        Inputs biased_inputs(inputs);
+        //pushback bias
+        // TODO: fix bias
+        biased_inputs.push_back(1);
+        auto sigmoid = [] (float x)
+        {
+            auto res = 2/(1+std::exp(-4.9*x))-1;
+            return res;
+        };
+
         // TODO: add sigmoid
         std::vector<Neuron> network;
         Outputs outputs;
-        Evaluator ev;
 
-        for(unsigned i = 0; i < ev.number_of_inputs_; ++i)
+        for(unsigned i = 0; i < Parameters::inputs; ++i)
         {
             Neuron n(i);
-            n.value_ = inputs[i];
+            n.value_ = biased_inputs[i];
+            DEBUG("Placing neuron %d with input %f", n.index_, n.value_);
             network.emplace_back(n);
         }
 
-        for(unsigned i = 0; i < ev.number_of_outputs_; ++i)
+        for(unsigned i = 0; i < Parameters::outputs; ++i)
         {
+            DEBUG("Adding neuron with number %d", Parameters::genome_size + i);
             network.emplace_back(Neuron(Parameters::genome_size + i));
         }
 
@@ -192,6 +205,7 @@ struct Genome::Impl
         };
 
         std::sort(genes.begin(), genes.end(), comp);
+        DEBUG("Will enumerate genes");
         for (auto& g : genes)
         {
             auto out_predicate = [&g] (const Gene& gene)
@@ -201,13 +215,17 @@ struct Genome::Impl
 
             if (std::find_if(genes.begin(), genes.end(), out_predicate) == genes.end())
             {
+                DEBUG("Adding neuron with number %d", g.out());
                 network.emplace_back(Neuron (g.out()));
             }
 
             {
                 auto it = std::find(network.begin(), network.end(), g.out());
+                DEBUG("Found neuron with index %d", g.out());
                 assert(it != network.end());
                 Neuron& found_neuron = *it;
+                DEBUG("Pushing gene into found neuron");
+                std::cout << g << std::endl;
                 found_neuron.input_.push_back(g);
             }
 
@@ -221,11 +239,39 @@ struct Genome::Impl
                 network.emplace_back(n);
             }
         }
+        auto is_input = [] (const Neuron& n)
+        {
+            return n.index_ < Parameters::inputs;
+        };
+
+        auto is_output = [this] (const Neuron& n)
+        {
+            return n.index_ >= last_neuron_ + Parameters::outputs;
+        };
 
         for(auto& n : network)
         {
-            // TODO: calculate
-            (void)n;
+
+            float sum = 0;
+            if(!is_input(n))
+            {
+                for (auto& incoming : n.input_)
+                {
+                    auto find_in_neuron = [&incoming] (const Neuron& neuron)
+                    {
+                        return incoming.in() == neuron.index_;
+                    };
+                    auto it = std::find_if(network.begin(), network.end(), find_in_neuron);
+                    assert(it != network.end());
+                    const Neuron& found_neuron = *it;
+                    sum += found_neuron.value_ * incoming.weight();
+                }
+                n.value_ = sigmoid(sum);
+            }
+            if (is_output(n))
+            {
+                outputs.push_back(n.value_);
+            }
         }
         return outputs;
     }

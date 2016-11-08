@@ -2,7 +2,7 @@
 
 #include <vector>
 
-using Outputs = std::vector<int>;
+using Outputs = std::vector<float>;
 using Inputs = std::vector<int>;
 
 struct Evaluator
