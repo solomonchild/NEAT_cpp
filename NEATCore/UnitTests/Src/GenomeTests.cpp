@@ -4,6 +4,50 @@
 #include "Parameters.hpp"
 
 
+TEST(GenomeTest, CompatibilityTestTwoExcessOneDisjointWeightDifference)
+{
+    auto generator = std::make_shared<RandomGenerator>();
+    Genome::Genes gs1;
+    {
+        Gene g1;
+        g1.innovation(1);
+        g1.weight(1.2f);
+        Gene g2;
+        g2.innovation(3);
+        g2.weight(.98f);
+        gs1.push_back(g1);
+        gs1.push_back(g2);
+    }
+
+    auto genome1 = Genome(generator, gs1);
+    Genome::Genes gs2;
+    {
+        Gene g1;
+        g1.innovation(1);
+        g1.weight(0.5f);
+        Gene g2;
+        g2.innovation(2);
+        g2.weight(0.4f);
+        Gene g3;
+        g3.innovation(3);
+        g3.weight(0.2f);
+        Gene g4;
+        g4.innovation(4);
+        g4.weight(1.2f);
+        Gene g5;
+        g5.innovation(5);
+        gs2.push_back(g1);
+        gs2.push_back(g2);
+        gs2.push_back(g3);
+        gs2.push_back(g4);
+        gs2.push_back(g5);
+    }
+    auto genome2 = Genome(generator, gs2);
+    float distance = genome1.compatibility_distance(genome2);
+
+    ASSERT_EQ(1.3184f, distance);
+
+}
 
 TEST(GenomeTest, CompatibilityTestTwoExcessOneDisjoint)
 {

@@ -64,17 +64,17 @@ struct Genome::Impl
       unsigned largest = 0;
       std::map<unsigned, bool> innovations1;
       std::map<unsigned, bool> innovations2;
-      std::map<int, bool> weights1;
-      std::map<int, bool> weights2;
+      std::map<int, float> weights1;
+      std::map<int, float> weights2;
       for(auto& g : genes_)
       {
          innovations1[g.innovation()] = true;
-         weights1[g.innovation()] = true;
+         weights1[g.innovation()] = g.weight();
       }
       for(auto& g : rhs.impl_->genes_)
       {
          innovations2[g.innovation()] = true;
-         weights2[g.innovation()] = true;
+         weights2[g.innovation()] = g.weight();
          if(g.innovation() > largest && innovations1[g.innovation()])
          {
              largest = g.innovation();
