@@ -1,11 +1,18 @@
 #include "Gene.hpp"
 #include <iostream>
 
+static unsigned get_next_innovation()
+{
+    static unsigned innovation = 0;
+    return innovation++;
+}
+
 struct Gene::Impl
 {
     Impl(std::shared_ptr<RandomGenerator> generator)
         :generator_(new RandomGenerator(*generator))
         ,weight_(generator->get_next())
+        ,innovation_(get_next_innovation())
     {
     }
 

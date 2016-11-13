@@ -5,13 +5,76 @@
 
 
 
-TEST(GenomeTest, CompatibilityTest)
+TEST(GenomeTest, CompatibilityTestTwoExcessOneDisjoint)
 {
     auto generator = std::make_shared<RandomGenerator>();
-    auto genome1 = Genome(generator);
-    auto genome2 = Genome(generator);
+    Genome::Genes gs1;
+    {
+        Gene g1;
+        g1.innovation(1);
+        Gene g2;
+        g2.innovation(3);
+        gs1.push_back(g1);
+        gs1.push_back(g2);
+    }
+
+    auto genome1 = Genome(generator, gs1);
+    Genome::Genes gs2;
+    {
+        Gene g1;
+        g1.innovation(1);
+        Gene g2;
+        g2.innovation(2);
+        Gene g3;
+        g3.innovation(3);
+        Gene g4;
+        g4.innovation(4);
+        Gene g5;
+        g5.innovation(5);
+        gs2.push_back(g1);
+        gs2.push_back(g2);
+        gs2.push_back(g3);
+        gs2.push_back(g4);
+        gs2.push_back(g5);
+    }
+    auto genome2 = Genome(generator, gs2);
     float distance = genome1.compatibility_distance(genome2);
-    ASSERT_LE(0, distance);
+
+    ASSERT_EQ(1.2f, distance);
+}
+TEST(GenomeTest, CompatibilityTestTwoExcessZeroWeight)
+{
+    auto generator = std::make_shared<RandomGenerator>();
+    Genome::Genes gs1;
+    {
+        Gene g1;
+        g1.innovation(1);
+        Gene g2;
+        g2.innovation(2);
+        gs1.push_back(g1);
+        gs1.push_back(g2);
+    }
+
+    auto genome1 = Genome(generator, gs1);
+    Genome::Genes gs2;
+    {
+        Gene g1;
+        g1.innovation(1);
+        Gene g2;
+        g2.innovation(2);
+        Gene g3;
+        g3.innovation(3);
+        Gene g4;
+        g4.innovation(4);
+        gs2.push_back(g1);
+        gs2.push_back(g2);
+        gs2.push_back(g3);
+        gs2.push_back(g4);
+    }
+    auto genome2 = Genome(generator, gs2);
+    float distance = genome1.compatibility_distance(genome2);
+
+    ASSERT_EQ(1, distance);
 }
 
 TEST(GenomeTest, EvaluateNetworkTest)
@@ -57,9 +120,9 @@ TEST(GenomeTest, EvaluateNetworkTest)
     gene1.weight(0.5);
     gene2.weight(0.3);
     gene1.in(0);
-    gene1.out(Parameters::genome_size);
+    gene1.out(Parameters::genome_size - 1);
     gene2.in(1);
-    gene2.out(Parameters::genome_size);
+    gene2.out(Parameters::genome_size - 1);
 
     Genome genome(generator, {gene1, gene2});
     Outputs expected_outputs = {0.96108983};

@@ -4,12 +4,13 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
+#include <map>
 #include <cassert>
 
 #include "Parameters.hpp"
 #include "Gene.hpp"
+#include "Logger.hpp"
 
-#define DEBUG(x, ...) printf(x"\n", ##__VA_ARGS__)
 
 
 
@@ -34,32 +35,87 @@ struct Neuron
 using Neurons = std::vector<Neuron>;
 struct Genome::Impl
 {
-    Impl(std::shared_ptr<RandomGenerator> generator)
-        :generator_(generator)
-        , last_neuron_(Parameters::inputs)
-    {
-        for (Genes::size_type output_index = Parameters::genome_size  - Parameters::outputs; output_index < Parameters::genome_size; ++output_index)
-        {
-            for (Genes::size_type input_index = 0; input_index < Parameters::inputs; ++input_index)
-            {
-                Gene gene(generator_);
-                gene.in(input_index);
-                gene.out(output_index);
-                genes_.push_back(gene);
-            }
-        }
-    }
     Impl(std::shared_ptr<RandomGenerator> generator, const Genes& genes)
         :generator_(generator)
-        , last_neuron_(Parameters::inputs)
+        , last_neuron_(Parameters::inputs - 1)
         , genes_(genes)
     {
+        if(genes.size() == 0)
+        {
+            for (Genes::size_type output_index = Parameters::genome_size  - Parameters::outputs; output_index < Parameters::genome_size; ++output_index)
+            {
+                for (Genes::size_type input_index = 0; input_index < Parameters::inputs; ++input_index)
+                {
+                    Gene gene(generator_);
+                    gene.in(input_index);
+                    gene.out(output_index);
+                    genes_.push_back(gene);
+                }
+            }
+        }
     }
 
 
     float compatibility_distance(const Genome& rhs)
     {
-        return 0;
+      float num_of_disjoint = 0;
+      float num_of_excess = 0;
+      float avg_weight_diff = 0;
+      unsigned largest = 0;
+      std::map<unsigned, bool> innovations1;
+      std::map<unsigned, bool> innovations2;
+      std::map<int, bool> weights1;
+      std::map<int, bool> weights2;
+      for(auto& g : genes_)
+      {
+         innovations1[g.innovation()] = true;
+         weights1[g.innovation()] = true;
+      }
+      for(auto& g : rhs.impl_->genes_)
+      {
+         innovations2[g.innovation()] = true;
+         weights2[g.innovation()] = true;
+         if(g.innovation() > largest && innovations1[g.innovation()])
+         {
+             largest = g.innovation();
+         }
+      }
+      for(unsigned i = 0; i < genes_.size(); ++i)
+      {
+        auto innovation = genes_[i].innovation();
+        if(innovation > largest)
+        {
+            ++num_of_excess;
+        }
+        else if(innovations2.find(innovation) == innovations2.end() || innovations2[innovation] == false)
+        {
+            ++num_of_disjoint;
+        }
+        else
+        {
+            avg_weight_diff += std::abs(weights1[innovation] - weights2[innovation]);
+        }
+      }
+
+      for(unsigned i = 0; i < rhs.impl_->genes_.size(); ++i)
+      {
+        auto innovation = rhs.impl_->genes_[i].innovation();
+        if(innovation > largest)
+        {
+            ++num_of_excess;
+        }
+        else if(innovations1.find(innovation) == innovations1.end() || innovations1[innovation] == false)
+        {
+            ++num_of_disjoint;
+        }
+      }
+      auto max_genes = std::max(genes_.size(), rhs.impl_->genes_.size());
+      avg_weight_diff /= max_genes;
+      num_of_disjoint /= max_genes;
+      num_of_excess /= max_genes;
+      auto result = Parameters::disjoint_coeff * num_of_disjoint + Parameters::excess_coeff * num_of_excess
+              + Parameters::weights_coeff * avg_weight_diff;
+      return result;
     }
 
     void mutate_weight()
@@ -74,7 +130,11 @@ struct Genome::Impl
 
     void mutate_node()
     {
-       last_neuron_++;
+       if(genes_.size() >= Parameters::genome_size)
+       {
+           DEBUG("Cannot mutate node. Genome full.");
+           return;
+       }
        auto& gene = get_random_gene();
        Gene gene1(gene);
        Gene gene2(gene);
@@ -90,7 +150,7 @@ struct Genome::Impl
 
        genes_.push_back(gene1);
        genes_.push_back(gene2);
-
+       last_neuron_++;
     }
 
     Gene& get_random_gene()
@@ -152,16 +212,19 @@ struct Genome::Impl
 
     void mutate()
     {
+        DEBUG("Mutating");
         // TODO: Probabilities of point and enable/disable mutations
         float p_of_node_mutate = generator_->get_next(1);
         if (p_of_node_mutate <= Parameters::node_mutation_chance)
         {
+            DEBUG("Will add node gene");
             mutate_node();
         }
 
         float p_of_link_mutate = generator_->get_next(1);
         if(p_of_link_mutate <= Parameters::link_mutation_chance)
         {
+            DEBUG("Will mutate connection");
             mutate_connection();
         }
     }
@@ -172,7 +235,7 @@ struct Genome::Impl
         Inputs biased_inputs(inputs);
         //pushback bias
         // TODO: fix bias
-        biased_inputs.push_back(1);
+        //biased_inputs.push_back(1);
         auto sigmoid = [] (float x)
         {
             auto res = 2/(1+std::exp(-4.9*x))-1;
@@ -187,14 +250,15 @@ struct Genome::Impl
         {
             Neuron n(i);
             n.value_ = biased_inputs[i];
-            DEBUG("Placing neuron %d with input %f", n.index_, n.value_);
+            DEBUG("Adding input neuron %d with input %f", n.index_, n.value_);
             network.emplace_back(n);
         }
 
         for(unsigned i = 0; i < Parameters::outputs; ++i)
         {
-            DEBUG("Adding neuron with number %d", Parameters::genome_size + i);
-            network.emplace_back(Neuron(Parameters::genome_size + i));
+            auto index = Parameters::genome_size - Parameters::outputs + i;
+            DEBUG("Adding output neuron with index %d", index);
+            network.emplace_back(Neuron(index));
         }
 
         Genes genes(genes_);
@@ -208,20 +272,21 @@ struct Genome::Impl
         DEBUG("Will enumerate genes");
         for (auto& g : genes)
         {
-            auto out_predicate = [&g] (const Gene& gene)
-            {
-                    return g.out() == gene.out();
-            };
+//            auto out_predicate = [&g] (const Gene& gene)
+//            {
+//                    return g.out() == gene.out();
+//            };
 
-            if (std::find_if(genes.begin(), genes.end(), out_predicate) == genes.end())
+            //if (std::find_if(genes.begin(), genes.end(), out_predicate) == genes.end())
+            if(std::find(network.begin(), network.end(), g.out()) == network.end())
             {
                 DEBUG("Adding neuron with number %d", g.out());
                 network.emplace_back(Neuron (g.out()));
             }
 
             {
+                DEBUG("Trying to find neuron with index %d", g.out());
                 auto it = std::find(network.begin(), network.end(), g.out());
-                DEBUG("Found neuron with index %d", g.out());
                 assert(it != network.end());
                 Neuron& found_neuron = *it;
                 DEBUG("Pushing gene into found neuron");
