@@ -5,6 +5,7 @@
 #include "Genome.hpp"
 #include "Evaluator.hpp"
 #include "Logger.hpp"
+#include "Pool.hpp"
 
 int main(int argc, char** argv)
 {
