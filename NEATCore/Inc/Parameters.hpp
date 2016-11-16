@@ -13,8 +13,4 @@ namespace Parameters
 
    const float link_mutation_chance = 0.97;
    const float node_mutation_chance = 0.97;
-
-   //TODO: carry out these to Evaluator
-   const unsigned inputs = 2;
-   const unsigned outputs = 1;
 }

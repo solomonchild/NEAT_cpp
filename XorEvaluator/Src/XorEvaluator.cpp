@@ -4,11 +4,8 @@
 
 #include "Evaluator.hpp"
 
-Evaluator::Evaluator()
-   : number_of_inputs_(2)
-   , number_of_outputs_(1)
-{
-}
+const unsigned Evaluator::number_of_inputs_ = 2;
+const unsigned Evaluator::number_of_outputs_ = 1;
 
 float Evaluator::get_fitness(const Outputs& outputs, const Inputs& inputs)
 {

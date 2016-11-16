@@ -10,4 +10,4 @@ ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCES}
     ${NEATCore_sources}/RandomGenerator.cpp
 )
 
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} gtest xor_eval)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} gtest)

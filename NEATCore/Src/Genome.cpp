@@ -10,6 +10,7 @@
 #include "Parameters.hpp"
 #include "Gene.hpp"
 #include "Logger.hpp"
+#include "Evaluator.hpp"
 
 
 
@@ -37,14 +38,14 @@ struct Genome::Impl
 {
     Impl(std::shared_ptr<RandomGenerator> generator, const Genes& genes)
         :generator_(generator)
-        , last_neuron_(Parameters::inputs - 1)
+        , last_neuron_(Evaluator::number_of_inputs_ - 1)
         , genes_(genes)
     {
         if(genes.size() == 0)
         {
-            for (Genes::size_type output_index = Parameters::genome_size  - Parameters::outputs; output_index < Parameters::genome_size; ++output_index)
+            for (Genes::size_type output_index = Parameters::genome_size  - Evaluator::number_of_outputs_; output_index < Parameters::genome_size; ++output_index)
             {
-                for (Genes::size_type input_index = 0; input_index < Parameters::inputs; ++input_index)
+                for (Genes::size_type input_index = 0; input_index < Evaluator::number_of_inputs_; ++input_index)
                 {
                     Gene gene(generator_);
                     gene.in(input_index);
@@ -246,7 +247,7 @@ struct Genome::Impl
         std::vector<Neuron> network;
         Outputs outputs;
 
-        for(unsigned i = 0; i < Parameters::inputs; ++i)
+        for(unsigned i = 0; i < Evaluator::number_of_inputs_; ++i)
         {
             Neuron n(i);
             n.value_ = biased_inputs[i];
@@ -254,9 +255,9 @@ struct Genome::Impl
             network.emplace_back(n);
         }
 
-        for(unsigned i = 0; i < Parameters::outputs; ++i)
+        for(unsigned i = 0; i < Evaluator::number_of_outputs_; ++i)
         {
-            auto index = Parameters::genome_size - Parameters::outputs + i;
+            auto index = Parameters::genome_size - Evaluator::number_of_outputs_ + i;
             DEBUG("Adding output neuron with index %d", index);
             network.emplace_back(Neuron(index));
         }
@@ -306,12 +307,12 @@ struct Genome::Impl
         }
         auto is_input = [] (const Neuron& n)
         {
-            return n.index_ < Parameters::inputs;
+            return n.index_ < Evaluator::number_of_inputs_;
         };
 
         auto is_output = [this] (const Neuron& n)
         {
-            return n.index_ >= last_neuron_ + Parameters::outputs;
+            return n.index_ >= last_neuron_ + Evaluator::number_of_outputs_;
         };
 
         for(auto& n : network)
