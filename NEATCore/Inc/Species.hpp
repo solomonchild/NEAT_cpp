@@ -11,6 +11,7 @@ class Species
 public:
     using Genomes = std::vector<Genome>;
     Species(std::shared_ptr<RandomGenerator>&);
+    ~Species();
 private:
     struct Impl;
     std::unique_ptr<Impl> impl_;
