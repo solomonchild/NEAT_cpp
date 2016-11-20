@@ -43,7 +43,7 @@ TEST(GeneTest, ConstructGeneWithPredictableGenerator)
     std::vector<Gene> genes;
     for(unsigned i = 0; i < 10; ++i)
     {
-        genes.push_back(Gene(generator));
+        genes.push_back(Gene(generator, -1));
     }
 
     size_t i = 0;

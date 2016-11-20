@@ -18,6 +18,8 @@ public:
 
     Outputs evaluate_network(const Inputs&);
 
+    Genome crossover(const Genome&);
+
     Genome(std::shared_ptr<RandomGenerator>, const Genes& = {});
 
     Genome(const Genome&);

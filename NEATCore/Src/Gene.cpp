@@ -1,31 +1,39 @@
 #include "Gene.hpp"
 #include <iostream>
 
-static unsigned get_next_innovation()
-{
-    static unsigned innovation = 0;
-    return innovation++;
-}
-
 struct Gene::Impl
 {
-    Impl(std::shared_ptr<RandomGenerator> generator)
-        :generator_(new RandomGenerator(*generator))
-        ,weight_(generator->get_next())
-        ,innovation_(get_next_innovation())
+    Impl(std::shared_ptr<RandomGenerator> generator,
+         float weight,
+         unsigned innovation,
+         unsigned in,
+         unsigned out,
+         bool is_enabled)
+
+        :generator_(generator)
+        ,weight_(weight)
+        ,innovation_(innovation)
+        ,in_(in)
+        ,out_(out)
+        ,is_enabled_(is_enabled)
     {
+        if(weight < 0)
+        {
+            weight_ = generator_->get_next();
+        }
     }
 
     Impl()
+        :generator_(std::make_shared<RandomGenerator>())
     {
     }
 
     std::shared_ptr<RandomGenerator> generator_;
-    bool is_enabled_ = true;
     float weight_ = 0.0f;
     unsigned innovation_ = 0;
     unsigned in_ = 0;
     unsigned out_ = 0;
+    bool is_enabled_ = true;
 };
 
 
@@ -35,8 +43,13 @@ Gene::Gene()
 {
 }
 
-Gene::Gene(std::shared_ptr<RandomGenerator> generator)
-:impl_(new Impl(generator))
+Gene::Gene(std::shared_ptr<RandomGenerator> generator,
+         float weight,
+         unsigned innovation,
+         unsigned in,
+         unsigned out,
+         bool is_enabled)
+:impl_(new Impl(generator, weight, innovation, in, out, is_enabled))
 {
 }
 
@@ -116,7 +129,7 @@ void Gene::out(unsigned val)
 
 std::ostream& operator<<(std::ostream& stream, const Gene& g)
 {
-   stream << "[Is enabled: "  << g.impl_->is_enabled_ << ", ";
+   stream << "[Is enabled: " << std::boolalpha << g.impl_->is_enabled_ << ", ";
    stream << "weight: "  << g.impl_->weight_ << ", ";
    stream << "innovation: "  << g.impl_->innovation_ << ", ";
    stream << "in: "  << g.impl_->in_ << ", ";

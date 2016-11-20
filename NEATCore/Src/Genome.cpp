@@ -230,6 +230,40 @@ struct Genome::Impl
         }
     }
 
+    Genome crossover(const Genome& other)
+    {
+        Genome::Genes genes;
+        std::map<int, Gene> innovations;
+
+        for (const auto& g : other.impl_->genes_)
+        {
+            innovations[g.innovation()]  = g;
+        }
+
+        for (const auto& g : genes_)
+        {
+            unsigned innovation = g.innovation();
+            auto it = innovations.find(innovation);
+            if(it == innovations.end())
+            {
+                genes.push_back(g);
+            }
+            else
+            {
+                auto chance = generator_->get_next(2);
+                //TODO: replace with a constant
+                if(chance > 1 && it->second.is_enabled())
+                {
+                    genes.push_back(it->second);
+                }
+                else
+                {
+                    genes.push_back(g);
+                }
+            }
+        }
+        return Genome(generator_, genes);
+    }
 
     Outputs evaluate_network(const Inputs& inputs)
     {
@@ -392,14 +426,17 @@ float Genome::compatibility_distance(const Genome& rhs)
     return impl_->compatibility_distance(rhs);
 }
 
+
+Genome Genome::crossover(const Genome& other)
+{
+    return impl_->crossover(other);
+}
+
 std::ostream& operator<<(std::ostream& stream, const Genome& genome)
 {
     for (auto g : genome.impl_->genes_)
     {
-        if(g.is_enabled())
-        {
-            stream << g;
-        }
+        stream << g;
     }
     stream << "\n";
     return stream;
