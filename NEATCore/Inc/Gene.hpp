@@ -24,6 +24,8 @@ public:
     Gene& operator=(Gene&&);
     ~Gene();
 
+    bool operator==(const Gene&) const;
+
     bool is_enabled() const;
     void is_enabled(bool);
 

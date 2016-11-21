@@ -185,7 +185,7 @@ TEST(GenomeTest, EvaluateNetworkTest)
 
 TEST(GenomeTest, CrossoverTest)
 {
-    std::vector<float> nums = {2};
+    std::vector<float> nums = {1};
     auto generator = std::make_shared<PredictableGenerator>(nums);
 
     Genome g1 { generator,
@@ -201,13 +201,13 @@ TEST(GenomeTest, CrossoverTest)
 
     Genome g2 { generator,
         {
-            {generator, 1.0f, 1, 1, 4, false},
-            {generator, 1.0f, 2, 2, 4},
-            {generator, 1.0f, 3, 3, 4},
-            {generator, 1.0f, 4, 2, 5, false},
-            {generator, 1.0f, 6, 4, 5},
-            {generator, 1.0f, 7, 1, 6},
-            {generator, 1.0f, 8, 6, 4},
+            {generator, 2.0f, 1, 1, 4, false},
+            {generator, 2.0f, 2, 2, 4},
+            {generator, 2.0f, 3, 3, 4},
+            {generator, 2.0f, 4, 2, 5, false},
+            {generator, 2.0f, 6, 4, 5},
+            {generator, 2.0f, 7, 1, 6},
+            {generator, 2.0f, 8, 6, 4},
 
         }
     };
@@ -215,5 +215,14 @@ TEST(GenomeTest, CrossoverTest)
     std::cout << g2 << std::endl;
     auto resulting_genome = g1.crossover(g2);
     std::cout << resulting_genome;
-    ASSERT_TRUE(false);
+    Genome expected_genome { generator,
+        {
+            {generator, 1.0f, 1, 1, 4},
+            {generator, 2.0f, 2, 2, 4},
+            {generator, 1.0f, 4, 2, 5, false},
+            {generator, 1.0f, 5, 3, 5},
+            {generator, 2.0f, 6, 4, 5},
+        }
+   };
+   ASSERT_EQ(expected_genome, resulting_genome);
 }

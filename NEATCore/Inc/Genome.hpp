@@ -29,6 +29,8 @@ public:
     Genome& operator=(Genome&&);
     ~Genome();
 
+    bool operator ==(const Genome&) const;
+
 private:
     friend std::ostream& operator<<(std::ostream& stream, const Genome& genome);
     struct Impl;

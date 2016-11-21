@@ -250,9 +250,9 @@ struct Genome::Impl
             }
             else
             {
-                auto chance = generator_->get_next(2);
+                auto chance = generator_->get_next();
                 //TODO: replace with a constant
-                if(chance > 1 && it->second.is_enabled())
+                if(chance > 0.5 && it->second.is_enabled())
                 {
                     genes.push_back(it->second);
                 }
@@ -376,6 +376,11 @@ struct Genome::Impl
         return outputs;
     }
 
+    bool operator ==(const Impl& other) const
+    {
+        return genes_ == other.genes_ && last_neuron_ == other.last_neuron_;
+    }
+
     std::shared_ptr<RandomGenerator> generator_;
     unsigned int last_neuron_;
     Genes genes_;
@@ -432,8 +437,14 @@ Genome Genome::crossover(const Genome& other)
     return impl_->crossover(other);
 }
 
+bool Genome::operator ==(const Genome& other) const
+{
+    return *impl_ == *other.impl_;
+}
+
 std::ostream& operator<<(std::ostream& stream, const Genome& genome)
 {
+    stream << "Last neuron: " << genome.impl_->last_neuron_ << '\n';
     for (auto g : genome.impl_->genes_)
     {
         stream << g;

@@ -28,6 +28,15 @@ struct Gene::Impl
     {
     }
 
+    bool operator ==(const Impl& other) const
+    {
+        return weight_ == other.weight_
+                && innovation_ == other.innovation_
+                && in_ == other.in_
+                && out_ == other.out_
+                && is_enabled_ == other.is_enabled_;
+    }
+
     std::shared_ptr<RandomGenerator> generator_;
     float weight_ = 0.0f;
     unsigned innovation_ = 0;
@@ -136,4 +145,10 @@ std::ostream& operator<<(std::ostream& stream, const Gene& g)
    stream << "out: "  << g.impl_->out_ << "]";
    stream << "\n";
    return stream;
+}
+
+
+bool Gene::operator ==(const Gene& other) const
+{
+    return *impl_ == *other.impl_;
 }
