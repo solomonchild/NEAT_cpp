@@ -1,9 +1,11 @@
 #pragma once
 
 #include <cstddef>
+#include "Evaluator.hpp"
 
 namespace Parameters
 {
+
    const size_t population_size = 20;
    const size_t genome_size = 30;
    const float disjoint_coeff = 2.0;

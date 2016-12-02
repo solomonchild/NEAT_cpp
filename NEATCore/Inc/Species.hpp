@@ -19,6 +19,8 @@ public:
      * @return
      */
     Genome breed();
+    bool will_genome_fit(const Genome&);
+    void calculate_fitness();
     ~Species();
 private:
     struct Impl;

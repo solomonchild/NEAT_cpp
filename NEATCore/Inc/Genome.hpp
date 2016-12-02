@@ -16,7 +16,7 @@ public:
     float compatibility_distance(const Genome&);
     void mutate();
 
-    Outputs evaluate_network(const Inputs&);
+    Outputs evaluate_network(const Inputs&) const;
 
     Genome crossover(const Genome&);
 

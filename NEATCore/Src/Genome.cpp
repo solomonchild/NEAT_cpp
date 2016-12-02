@@ -265,7 +265,7 @@ struct Genome::Impl
         return Genome(generator_, genes);
     }
 
-    Outputs evaluate_network(const Inputs& inputs)
+    Outputs evaluate_network(const Inputs& inputs) const
     {
         Inputs biased_inputs(inputs);
         //pushback bias
@@ -416,7 +416,7 @@ Genome& Genome::operator=(Genome&& other)
 }
 
 
-Outputs Genome::evaluate_network(const Inputs& inputs)
+Outputs Genome::evaluate_network(const Inputs& inputs) const
 {
     return impl_->evaluate_network(inputs);
 }
