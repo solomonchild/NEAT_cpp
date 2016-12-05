@@ -8,7 +8,6 @@
 TEST(Species, GenomeMustFitTest)
 {
     auto generator = std::make_shared<RandomGenerator>();
-    Environment::set_inputs({0, 1});
     Species species(generator);
     Genome g{generator, {
         {generator, 0, 1}
@@ -41,7 +40,6 @@ TEST(Species, GenomeMustNotFitTest)
       }
     };
 
-    Environment::set_inputs({0, 1});
     Species species(generator);
 
     species.add_genome(genome1);
@@ -52,7 +50,6 @@ TEST(Species, GenomeMustNotFitTest)
 TEST(Species, MustFitToEmptySpecies)
 {
     auto generator = std::make_shared<RandomGenerator>();
-    Environment::set_inputs({0, 1});
     Species species(generator);
     auto genome = Genome {generator,
       {

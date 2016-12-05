@@ -41,6 +41,7 @@ struct Genome::Impl
         :generator_(generator)
         , last_neuron_(Evaluator::number_of_inputs_ - 1)
         , genes_(genes)
+        , fitness_(0)
     {
         if(genes.size() == 0)
         {
@@ -58,7 +59,7 @@ struct Genome::Impl
     }
 
 
-    float compatibility_distance(const Genome& rhs)
+    float compatibility_distance(const Genome& rhs) const
     {
       float num_of_disjoint = 0;
       float num_of_excess = 0;
@@ -389,6 +390,7 @@ struct Genome::Impl
     std::shared_ptr<RandomGenerator> generator_;
     unsigned int last_neuron_;
     Genes genes_;
+    float fitness_;
 };
 
 Genome::Genome(std::shared_ptr<RandomGenerator> generator, const Genes& genes)
@@ -431,7 +433,7 @@ void Genome::mutate()
     impl_->mutate();
 }
 
-float Genome::compatibility_distance(const Genome& rhs)
+float Genome::compatibility_distance(const Genome& rhs) const
 {
     return impl_->compatibility_distance(rhs);
 }
@@ -445,6 +447,17 @@ Genome Genome::crossover(const Genome& other)
 bool Genome::operator ==(const Genome& other) const
 {
     return *impl_ == *other.impl_;
+}
+
+
+void Genome::set_fitness(float fitness)
+{
+    impl_->fitness_ = fitness;
+}
+
+float Genome::get_fitness() const
+{
+    return impl_->fitness_;
 }
 
 std::ostream& operator<<(std::ostream& stream, const Genome& genome)

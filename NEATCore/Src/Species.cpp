@@ -40,14 +40,7 @@ struct Species::Impl
     {
         auto comparator = [] (const Genome& g1, const Genome& g2)
         {
-            Evaluator eval;
-            auto outputs_first = g1.evaluate_network(Environment::get_inputs());
-            float fit1 = eval.get_fitness(outputs_first, Environment::get_inputs());
-
-            auto outputs_second = g2.evaluate_network(Environment::get_inputs());
-            float fit2 = eval.get_fitness(outputs_second, Environment::get_inputs());
-
-            return  fit1 < fit2;
+            return  g1.get_fitness() < g2.get_fitness();
         };
 
         if(genomes_.empty())
