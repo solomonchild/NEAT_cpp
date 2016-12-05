@@ -21,6 +21,12 @@ public:
     Genome breed();
     bool will_genome_fit(const Genome&);
     void calculate_fitness();
+
+    Species(const Species&);
+    Species& operator=(const Species&);
+
+    Species(Species&&);
+    Species& operator=(Species&&);
     ~Species();
 private:
     struct Impl;

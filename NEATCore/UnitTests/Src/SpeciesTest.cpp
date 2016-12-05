@@ -48,3 +48,22 @@ TEST(Species, GenomeMustNotFitTest)
     bool result = species.will_genome_fit(genome2);
     ASSERT_FALSE(result);
 }
+
+TEST(Species, MustFitToEmptySpecies)
+{
+    auto generator = std::make_shared<RandomGenerator>();
+    Environment::set_inputs({0, 1});
+    Species species(generator);
+    auto genome = Genome {generator,
+      {
+         {generator, 0, 1}
+        ,{generator, 0, 2}
+        ,{generator, 0, 3}
+        ,{generator, 0, 4}
+        ,{generator, 0, 5}
+      }
+    };
+
+    auto result = species.will_genome_fit(genome);
+    ASSERT_TRUE(result);
+}

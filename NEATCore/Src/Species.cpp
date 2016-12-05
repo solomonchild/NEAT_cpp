@@ -13,7 +13,7 @@ struct Species::Impl
     Impl(std::shared_ptr<RandomGenerator>& generator)
         :generator_(generator)
     {
-        //Genomes should be added on demand
+        // genomes should be added on demand
     }
 
     void add_genome(const Genome& genome)
@@ -33,7 +33,7 @@ struct Species::Impl
         auto genome2 = genomes_.at(generator_->get_next(genomes_.size()));
         return genome1.crossover(genome2);
 
-        //TODO: mutate at once
+        // TODO: try mutating at once
     }
 
     bool will_genome_fit(const Genome& genome)
@@ -50,7 +50,11 @@ struct Species::Impl
             return  fit1 < fit2;
         };
 
-        //in ascending
+        if(genomes_.empty())
+        {
+            return true;
+        }
+        // in ascending order
         std::sort(genomes_.begin(), genomes_.end(), comparator);
         auto fittest_genome = genomes_.back();
         float distance = fittest_genome.compatibility_distance(genome);
@@ -67,6 +71,28 @@ Species::Species(std::shared_ptr<RandomGenerator>& generator)
 }
 
 Species::~Species() = default;
+
+Species::Species(const Species& other)
+{
+    this->impl_ = std::make_unique<Impl>(*other.impl_);
+}
+
+Species& Species::operator=(const Species& other)
+{
+    this->impl_ = std::make_unique<Impl>(*other.impl_);
+    return *this;
+}
+
+Species::Species(Species&& other)
+{
+    this->impl_ = std::make_unique<Impl>(std::move(*other.impl_));
+}
+
+Species& Species::operator=(Species&& other)
+{
+    this->impl_ = std::make_unique<Impl>(std::move(*other.impl_));
+    return *this;
+}
 
 
 void Species::add_genome(const Genome& genome)
