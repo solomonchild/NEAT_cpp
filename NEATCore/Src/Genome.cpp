@@ -11,6 +11,7 @@
 #include "Gene.hpp"
 #include "Logger.hpp"
 #include "Evaluator.hpp"
+#include "Environment.hpp"
 
 
 
@@ -144,10 +145,14 @@ struct Genome::Impl
        gene1.in(gene.in());
        gene1.out(last_neuron_);
        gene1.weight(1);
+       Environment::inc_innovation_number();
+       gene1.innovation(Environment::get_innovation_number());
 
        gene2.in(last_neuron_);
        gene2.out(gene.out());
        gene2.weight(gene.weight());
+       Environment::inc_innovation_number();
+       gene2.innovation(Environment::get_innovation_number());
 
        genes_.push_back(gene1);
        genes_.push_back(gene2);

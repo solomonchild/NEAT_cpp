@@ -15,7 +15,7 @@ public:
     Gene& operator=(const Gene&);
     Gene(std::shared_ptr<RandomGenerator>,
          float weight = 0,
-         unsigned innovation = 0,
+         unsigned innovation = 1,
          unsigned in = 0,
          unsigned out = 0,
          bool is_enabled = true);
