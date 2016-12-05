@@ -444,11 +444,12 @@ bool Genome::operator ==(const Genome& other) const
 
 std::ostream& operator<<(std::ostream& stream, const Genome& genome)
 {
-    stream << "Last neuron: " << genome.impl_->last_neuron_ << '\n';
+    stream << "Genome {\n";
+    stream << "  Last neuron: " << genome.impl_->last_neuron_ << '\n';
     for (auto g : genome.impl_->genes_)
     {
-        stream << g;
+        stream << "  " << g;
     }
-    stream << "\n";
+    stream << "}\n";
     return stream;
 }
