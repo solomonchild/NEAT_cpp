@@ -31,7 +31,7 @@ struct Pool::Impl
     }
 
     std::shared_ptr<RandomGenerator> generator_;
-    Species species_;
+    SpeciesVector species_;
 };
 
 Pool::Pool(std::shared_ptr<RandomGenerator> & generator)
@@ -46,3 +46,13 @@ void Pool::add_genome(const Genome& genome)
 
 
 Pool::~Pool() = default;
+
+Pool::SpeciesVector::iterator Pool::begin()
+{
+    return impl_->species_.begin();
+}
+
+Pool::SpeciesVector::iterator Pool::end()
+{
+    return impl_->species_.end();
+}

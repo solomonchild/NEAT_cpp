@@ -28,6 +28,9 @@ public:
     Species(Species&&);
     Species& operator=(Species&&);
     ~Species();
+
+    Genomes::iterator begin();
+    Genomes::iterator end();
 private:
     struct Impl;
     std::unique_ptr<Impl> impl_;

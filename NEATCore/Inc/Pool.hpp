@@ -9,13 +9,16 @@
 class Pool
 {
 public:
-    using Species = std::vector<Species>;
+    using SpeciesVector = std::vector<Species>;
     Pool(std::shared_ptr<RandomGenerator>&);
 
     // TODO: use max_population constant
     void add_genome(const Genome& genome);
     void remove_weak_genomes();
     ~Pool();
+
+    SpeciesVector::iterator begin();
+    SpeciesVector::iterator end();
 private:
     struct Impl;
     std::unique_ptr<Impl> impl_;

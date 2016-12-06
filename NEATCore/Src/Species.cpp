@@ -103,3 +103,13 @@ Genome Species::breed()
 {
     return impl_->breed();
 }
+
+Species::Genomes::iterator Species::begin()
+{
+    return impl_->genomes_.begin();
+}
+
+Species::Genomes::iterator Species::end()
+{
+    return impl_->genomes_.end();
+}
