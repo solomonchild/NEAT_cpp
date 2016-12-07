@@ -13,6 +13,10 @@ namespace Parameters
    const float weights_coeff = 0.4;
    const float distance_threshold = 1.0;
 
-   const float link_mutation_chance = 0.97;
-   const float node_mutation_chance = 0.97;
+   const float link_mutation_chance = 0.50;
+   const float node_mutation_chance = 0.50;
+   const float weight_mutation_chance = 0.50;
+   const float enable_disable_mutation_chance = 0.50;
+
+   const float gene_weight_multiplier = 0.03;
 }
