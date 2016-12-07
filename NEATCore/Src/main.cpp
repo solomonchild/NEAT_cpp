@@ -31,11 +31,13 @@ int main(int argc, char** argv)
                         min_fitness = std::max(min_fitness, fitness);
                     }
                     genome.set_fitness(min_fitness);
+                    // TODO: review
+                    genome.mutate();
                     AINFO("Fitness: %f", min_fitness);
                     if(min_fitness < 0.3)
                     {
-                        std::cout << genome;
-                        std::cout << "DONEDONE";
+                        INFO("Done.");
+                        IF_INFO([&genome](){std::cout << genome;});
                         return 0;
                     }
                 }

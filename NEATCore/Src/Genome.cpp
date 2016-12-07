@@ -137,7 +137,7 @@ struct Genome::Impl
     {
        if(genes_.size() >= Parameters::genome_size)
        {
-           ADEBUG("Cannot mutate node. Genome full.");
+           AERROR("Cannot mutate node. Genome full.");
            return;
        }
        auto& gene = get_random_gene();
@@ -216,6 +216,7 @@ struct Genome::Impl
         if(!contains_gene(gene))
         {
             genes_.push_back(gene);
+            last_neuron_++;
         }
     }
 
@@ -271,7 +272,7 @@ struct Genome::Impl
             else
             {
                 auto chance = generator_->get_next();
-                //TODO: replace with a constant
+                // TODO: replace with a constant
                 if(chance > 0.5 && it->second.is_enabled())
                 {
                     genes.push_back(it->second);
@@ -282,6 +283,9 @@ struct Genome::Impl
                 }
             }
         }
+        auto gen = Genome(generator_, genes);
+        // TODO: cover this
+        gen.impl_->last_neuron_ = std::max(last_neuron_, other.impl_->last_neuron_);
         return Genome(generator_, genes);
     }
 
@@ -366,7 +370,8 @@ struct Genome::Impl
 
         auto is_output = [this] (const Neuron& n)
         {
-            return n.index_ >= last_neuron_ + Evaluator::number_of_outputs_;
+            // TODO: review/cover
+            return n.index_ >= Parameters::genome_size - Evaluator::number_of_outputs_;
         };
 
         for(auto& n : network)
