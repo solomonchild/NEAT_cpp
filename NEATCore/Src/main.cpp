@@ -15,7 +15,7 @@ int main(int argc, char** argv)
         std::array<Inputs, 4> inputs = {Inputs{1, 0}, Inputs{0, 1}, Inputs{0,0}, Inputs{1,1}};
         Pool pool(generator);
         Evaluator eval;
-        Environment::set_log_level(Environment::LogLevel::None);
+        Environment::set_log_level(Environment::LogLevel::Debug);
 
         while(true)
         {

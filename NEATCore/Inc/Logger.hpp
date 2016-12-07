@@ -1,26 +1,34 @@
 #pragma once
 
-
 #include <cstdio>
 #include <iomanip>
 #include <chrono>
+#include <future>
 
 #include "Environment.hpp"
 
-#define DEBUG(x, ...) Logging::log(Environment::LogLevel::Debug, x, ##__VA_ARGS__)
+#define ADEBUG(x, ...) std::async(std::launch::async, [=](){Logging::log(Environment::LogLevel::Debug, x, ##__VA_ARGS__);})
+#define AINFO(x, ...) std::async(std::launch::async, [=](){Logging::log(Environment::LogLevel::Info, x, ##__VA_ARGS__);})
+#define AWARN(x, ...) std::async(std::launch::async, [=](){Logging::log(Environment::LogLevel::Warning, x, ##__VA_ARGS__);})
+#define AERROR(x, ...) std::async(std::launch::async, [=](){Logging::log(Environment::LogLevel::Error, x, ##__VA_ARGS__);})
+#define ACRIT(x, ...) std::async(std::launch::async, [=](){Logging::log(Environment::LogLevel::Critical, x, ##__VA_ARGS__);})
+
+#define DEBUG(x, ...) Logging::log(Environment::LogLevel::Debug, x, ##__VA_ARGS__);
 #define INFO(x, ...) Logging::log(Environment::LogLevel::Info, x, ##__VA_ARGS__)
 #define WARN(x, ...) Logging::log(Environment::LogLevel::Warning, x, ##__VA_ARGS__)
 #define ERROR(x, ...) Logging::log(Environment::LogLevel::Error, x, ##__VA_ARGS__)
 #define CRIT(x, ...) Logging::log(Environment::LogLevel::Critical, x, ##__VA_ARGS__)
 
-template <typename T>
-void IF_DEBUG(T f)
-{
-    if(Environment::get_log_level() == Environment::LogLevel::Debug)
-    {
-        f();
-    }
-}
+template <typename T> void IF_DEBUG(T f) { if(Environment::get_log_level() == Environment::LogLevel::Debug) { f(); } }
+
+template <typename T> void IF_INFO(T f) { if(Environment::get_log_level() == Environment::LogLevel::Info) { f(); } }
+
+template <typename T> void IF_WARN(T f) { if(Environment::get_log_level() == Environment::LogLevel::Warning) { f(); } }
+
+template <typename T> void IF_ERROR(T f) { if(Environment::get_log_level() == Environment::LogLevel::Error) { f(); } }
+
+template <typename T> void IF_CRIT(T f) { if(Environment::get_log_level() == Environment::LogLevel::Critical) { f(); } }
+
 
 namespace Logging
 {
