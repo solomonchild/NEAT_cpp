@@ -26,7 +26,7 @@ struct Pool::Impl
                 return;
             }
         }
-        species_.push_back(::Species(generator_));
+        species_.push_back(Species(generator_));
         species_.back().add_genome(genome);
     }
 

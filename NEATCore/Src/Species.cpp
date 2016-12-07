@@ -29,11 +29,15 @@ struct Species::Impl
         {
             return genomes_.front();
         }
-        auto genome1 = genomes_.at(generator_->get_next(genomes_.size()));
-        auto genome2 = genomes_.at(generator_->get_next(genomes_.size()));
-        return genome1.crossover(genome2);
+        unsigned index = generator_->get_next(genomes_.size());
+        auto genome1 = genomes_.at(index);
+        index = generator_->get_next(genomes_.size());
+        auto genome2 = genomes_.at(index);
 
-        // TODO: try mutating at once
+        auto gen = genome1.crossover(genome2);
+
+        gen.mutate();
+        return gen;
     }
 
     bool will_genome_fit(const Genome& genome)

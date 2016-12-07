@@ -331,7 +331,7 @@ struct Genome::Impl
                 assert(it != network.end());
                 Neuron& found_neuron = *it;
                 DEBUG("Pushing gene into found neuron");
-                std::cout << g << std::endl;
+                IF_DEBUG([&g](){ std::cout << g << std::endl; });
                 found_neuron.input_.push_back(g);
             }
 
