@@ -222,31 +222,31 @@ struct Genome::Impl
 
     void mutate()
     {
-        INFO("Mutating");
+        DEBUG("Mutating");
         // TODO: Probabilities of point and enable/disable mutations
         float p_of_node_mutate = generator_->get_next(1);
         if (p_of_node_mutate <= Parameters::node_mutation_chance)
         {
-            INFO("Will add node gene");
+            DEBUG("Will add node gene");
             mutate_node();
         }
 
         float p_of_link_mutate = generator_->get_next();
         if(p_of_link_mutate <= Parameters::link_mutation_chance)
         {
-            INFO("Will mutate connection");
+            DEBUG("Will mutate connection");
             mutate_connection();
         }
         float p_of_enable_disable_mutate = generator_->get_next();
         if(p_of_enable_disable_mutate <= Parameters::enable_disable_mutation_chance)
         {
-            INFO("Will mutate enable/disable");
+            DEBUG("Will mutate enable/disable");
             mutate_enable_disable();
         }
         float p_of_weight_mutate = generator_->get_next();
         if(p_of_weight_mutate <= Parameters::weight_mutation_chance)
         {
-            INFO("Will mutate weight");
+            DEBUG("Will mutate weight");
             mutate_weight();
         }
     }
@@ -297,7 +297,7 @@ struct Genome::Impl
         //biased_inputs.push_back(1);
         auto sigmoid = [] (float x)
         {
-            auto res = 2/(1+std::exp(-4.9*x))-1;
+            float res = 2.0/(1+std::exp(-4.9*x))-1;
             return res;
         };
 
@@ -309,14 +309,12 @@ struct Genome::Impl
         {
             Neuron n(i);
             n.value_ = biased_inputs[i];
-            DEBUG("Adding input neuron %d with input %f", n.index_, n.value_);
             network.emplace_back(n);
         }
 
         for(unsigned i = 0; i < Evaluator::number_of_outputs_; ++i)
         {
             auto index = Parameters::genome_size - Evaluator::number_of_outputs_ + i;
-            DEBUG("Adding output neuron with index %d", index);
             network.emplace_back(Neuron(index));
         }
 
@@ -328,34 +326,22 @@ struct Genome::Impl
         };
 
         std::sort(genes.begin(), genes.end(), comp);
-        DEBUG("Will enumerate genes");
         for (auto& g : genes)
         {
-//            auto out_predicate = [&g] (const Gene& gene)
-//            {
-//                    return g.out() == gene.out();
-//            };
-
-            //if (std::find_if(genes.begin(), genes.end(), out_predicate) == genes.end())
             if(std::find(network.begin(), network.end(), g.out()) == network.end())
             {
-                DEBUG("Adding neuron with number %d", g.out());
                 network.emplace_back(Neuron (g.out()));
             }
 
             if(std::find(network.begin(), network.end(), g.in()) == network.end())
             {
-                DEBUG("Adding neuron with number %d", g.in());
                 network.emplace_back(Neuron (g.in()));
             }
 
             {
-                DEBUG("Trying to find neuron with index %d", g.out());
                 auto it = std::find(network.begin(), network.end(), g.out());
                 assert(it != network.end());
                 Neuron& found_neuron = *it;
-                DEBUG("Pushing gene into found neuron");
-                IF_DEBUG([&g](){ std::cout << g << std::endl; });
                 found_neuron.input_.push_back(g);
             }
 

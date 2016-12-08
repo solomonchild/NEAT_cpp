@@ -19,15 +19,15 @@
 #define ERROR(x, ...) Logging::log(Environment::LogLevel::Error, x, ##__VA_ARGS__)
 #define CRIT(x, ...) Logging::log(Environment::LogLevel::Critical, x, ##__VA_ARGS__)
 
-template <typename T> void IF_DEBUG(T f) { if(Environment::get_log_level() == Environment::LogLevel::Debug) { f(); } }
+template <typename T> void IF_DEBUG(T f) { if(Environment::get_log_level() <= Environment::LogLevel::Debug) { f(); } }
 
-template <typename T> void IF_INFO(T f) { if(Environment::get_log_level() == Environment::LogLevel::Info) { f(); } }
+template <typename T> void IF_INFO(T f) { if(Environment::get_log_level() <= Environment::LogLevel::Info) { f(); } }
 
-template <typename T> void IF_WARN(T f) { if(Environment::get_log_level() == Environment::LogLevel::Warning) { f(); } }
+template <typename T> void IF_WARN(T f) { if(Environment::get_log_level() <= Environment::LogLevel::Warning) { f(); } }
 
-template <typename T> void IF_ERROR(T f) { if(Environment::get_log_level() == Environment::LogLevel::Error) { f(); } }
+template <typename T> void IF_ERROR(T f) { if(Environment::get_log_level() <= Environment::LogLevel::Error) { f(); } }
 
-template <typename T> void IF_CRIT(T f) { if(Environment::get_log_level() == Environment::LogLevel::Critical) { f(); } }
+template <typename T> void IF_CRIT(T f) { if(Environment::get_log_level() <= Environment::LogLevel::Critical) { f(); } }
 
 namespace Logging
 {
@@ -35,7 +35,7 @@ namespace Logging
     template<typename... Params>
     void log(Environment::LogLevel level, const std::string& format, Params... params)
     {
-        if(Environment::get_log_level() > level)
+        if(Environment::get_log_level() > level || Environment::get_log_level() == Environment::LogLevel::None)
         {
             return;
         }
