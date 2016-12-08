@@ -33,7 +33,7 @@ int main(int argc, char** argv)
                     genome.set_fitness(min_fitness);
                     // TODO: review
                     genome.mutate();
-                    AINFO("Fitness: %f", min_fitness);
+                    INFO("Fitness: %f", min_fitness);
                     if(min_fitness < 0.3)
                     {
                         INFO("Done.");

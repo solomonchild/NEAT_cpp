@@ -29,7 +29,6 @@ template <typename T> void IF_ERROR(T f) { if(Environment::get_log_level() == En
 
 template <typename T> void IF_CRIT(T f) { if(Environment::get_log_level() == Environment::LogLevel::Critical) { f(); } }
 
-
 namespace Logging
 {
 
@@ -40,6 +39,25 @@ namespace Logging
         {
             return;
         }
+        auto level_to_string = [] (Environment::LogLevel level)
+        {
+            switch(level)
+            {
+            case Environment::LogLevel::Debug:
+                return "DEBUG";
+            case Environment::LogLevel::Info:
+                return "INFO";
+            case Environment::LogLevel::Warning:
+                return "WARN";
+            case Environment::LogLevel::Error:
+                return "ERROR";
+            case Environment::LogLevel::Critical:
+                return "CRIT";
+            default:
+                return "Unknown";
+            }
+        };
+
         auto print = [] (const std::string& format, auto... params)
         {
             std::string str;
@@ -52,7 +70,7 @@ namespace Logging
 
         auto time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         auto t = std::localtime(&time);
-        std::string str = print("[%d:%d:%d] DEBUG: ", t->tm_hour, t->tm_min, t->tm_sec);
+        std::string str = print("[%d:%d:%d] %s: ", t->tm_hour, t->tm_min, t->tm_sec, level_to_string(level));
         str += print(format, params...);
         std::cout << str << '\n';
     }
