@@ -23,18 +23,18 @@ int main(int argc, char** argv)
             {
                 for(auto& genome : species)
                 {
-                    float min_fitness = 0;
+                    float max_fitness = 0;
                     for(auto input : inputs)
                     {
                         auto outputs = genome.evaluate_network(input);
                         auto fitness =  eval.get_fitness(outputs, input);
-                        min_fitness = std::max(min_fitness, fitness);
+                        max_fitness = std::max(max_fitness, fitness);
                     }
-                    genome.set_fitness(min_fitness);
+                    genome.set_fitness(max_fitness);
                     // TODO: review
                     genome.mutate();
-                    INFO("Fitness: %f", min_fitness);
-                    if(min_fitness < 0.3)
+                    INFO("Fitness: %f", max_fitness);
+                    if(max_fitness != 1)
                     {
                         INFO("Done.");
                         IF_INFO([&genome](){std::cout << genome;});
