@@ -58,6 +58,12 @@ struct Species::Impl
         return distance <= Parameters::distance_threshold;
     }
 
+
+    void remove_weak_genomes()
+    {
+        genomes_.erase(std::remove_if(genomes_.begin(), genomes_.end(), [](const Genome& genome){return genome.get_fitness() == 0;}), genomes_.end());
+    }
+
     std::shared_ptr<RandomGenerator>& generator_;
     Genomes genomes_;
 };
@@ -116,4 +122,9 @@ Species::Genomes::iterator Species::begin()
 Species::Genomes::iterator Species::end()
 {
     return impl_->genomes_.end();
+}
+
+void Species::remove_weak_genomes()
+{
+    impl_->remove_weak_genomes();
 }

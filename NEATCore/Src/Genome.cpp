@@ -164,7 +164,7 @@ struct Genome::Impl
 
     Gene& get_random_gene()
     {
-        int index = generator_->get_next(genes_.size());
+        int index = generator_->get_next(genes_.size() - 1);
         return genes_[index];
     }
 
@@ -394,7 +394,7 @@ struct Genome::Impl
                     };
                     auto it = std::find_if(network.begin(), network.end(), find_in_neuron);
 
-                    INFO("Will find neuron with index %d", incoming.in());
+                    DEBUG("Will find neuron with index %d", incoming.in());
                     assert(it != network.end());
                     const Neuron& found_neuron = *it;
                     sum += found_neuron.value_ * incoming.weight();

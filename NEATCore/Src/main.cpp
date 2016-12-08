@@ -45,6 +45,7 @@ int main(int argc, char** argv)
             Species::Genomes genomes;
             for(auto& species : pool)
             {
+                species.remove_weak_genomes();
                 auto genome = species.breed();
                 genomes.emplace_back(genome);
             }

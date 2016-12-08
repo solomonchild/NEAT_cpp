@@ -14,7 +14,6 @@ public:
 
     // TODO: use max_population constant
     void add_genome(const Genome& genome);
-    void remove_weak_genomes();
     ~Pool();
 
     SpeciesVector::iterator begin();

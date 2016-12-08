@@ -31,6 +31,8 @@ public:
 
     Genomes::iterator begin();
     Genomes::iterator end();
+
+    void remove_weak_genomes();
 private:
     struct Impl;
     std::unique_ptr<Impl> impl_;
