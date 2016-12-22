@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdio>
+#include <iostream>
 #include <iomanip>
 #include <chrono>
 #include <future>

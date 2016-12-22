@@ -15,12 +15,13 @@ int main(int argc, char** argv)
         std::array<Inputs, 4> inputs = {Inputs{1, 0}, Inputs{0, 1}, Inputs{0,0}, Inputs{1,1}};
         Pool pool(generator);
         Evaluator eval;
-        Environment::set_log_level(Environment::LogLevel::Info);
+        Environment::set_log_level(Environment::LogLevel::Debug);
 
         while(true)
         {
             for(auto& species : pool)
             {
+                INFO("Next species");
                 for(auto& genome : species)
                 {
                     float max_fitness = 0;
@@ -34,7 +35,7 @@ int main(int argc, char** argv)
                     // TODO: review
                     genome.mutate();
                     INFO("Fitness: %f", max_fitness);
-                    if(max_fitness != 1)
+                    if(max_fitness < 0.5)
                     {
                         INFO("Done.");
                         IF_INFO([&genome](){std::cout << genome;});
@@ -46,7 +47,13 @@ int main(int argc, char** argv)
             for(auto& species : pool)
             {
                 species.remove_weak_genomes();
+                if(species.empty())
+                {
+                    continue;
+                }
+                CRIT("Before breed");
                 auto genome = species.breed();
+                CRIT("After breed");
                 genomes.emplace_back(genome);
             }
             for(auto genome : genomes)

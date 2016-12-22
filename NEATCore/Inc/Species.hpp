@@ -31,6 +31,7 @@ public:
 
     Genomes::iterator begin();
     Genomes::iterator end();
+    bool empty() const;
 
     void remove_weak_genomes();
 private:

@@ -52,6 +52,7 @@ struct Genome::Impl
                     Gene gene(generator_);
                     gene.in(input_index);
                     gene.out(output_index);
+                    gene.weight(generator_->get_next());
                     genes_.push_back(gene);
                 }
             }
@@ -146,6 +147,7 @@ struct Genome::Impl
        gene.is_enabled(false);
 
        gene1.in(gene.in());
+       CRIT("Last neuron before setting to out: %u", last_neuron_);
        gene1.out(last_neuron_);
        gene1.weight(1);
        Environment::inc_innovation_number();
@@ -159,6 +161,7 @@ struct Genome::Impl
 
        genes_.push_back(gene1);
        genes_.push_back(gene2);
+       CRIT("%s Last neuron: %u", __func__, last_neuron_);
        last_neuron_++;
     }
 
@@ -188,7 +191,7 @@ struct Genome::Impl
     Neuron get_random_neuron()
     {
         auto neurons = get_neurons();
-        int index = generator_->get_next(neurons.size());
+        int index = generator_->get_next(neurons.size() - 1);
         return neurons[index];
     }
 
@@ -217,6 +220,7 @@ struct Genome::Impl
         {
             genes_.push_back(gene);
             last_neuron_++;
+            CRIT("%s: Last neuron: %u", __func__, last_neuron_);
         }
     }
 
@@ -330,11 +334,13 @@ struct Genome::Impl
         {
             if(std::find(network.begin(), network.end(), g.out()) == network.end())
             {
+                DEBUG("Emplacing %d(out)", g.out());
                 network.emplace_back(Neuron (g.out()));
             }
 
             if(std::find(network.begin(), network.end(), g.in()) == network.end())
             {
+                DEBUG("Emplacing %d(in)", g.in());
                 network.emplace_back(Neuron (g.in()));
             }
 
@@ -363,6 +369,7 @@ struct Genome::Impl
         auto is_output = [this] (const Neuron& n)
         {
             // TODO: review/cover
+            DEBUG("Is output: %d", n.index_);
             return n.index_ >= Parameters::genome_size - Evaluator::number_of_outputs_;
         };
 
@@ -438,12 +445,17 @@ Genome& Genome::operator=(Genome&& other)
 
 Outputs Genome::evaluate_network(const Inputs& inputs) const
 {
+    std::cout << *this;
     return impl_->evaluate_network(inputs);
 }
 
 void Genome::mutate()
 {
+    CRIT("Before mutate");
+    std::cout << *this << "\n";
     impl_->mutate();
+    CRIT("After mutate");
+    std::cout << *this << "\n";
 }
 
 float Genome::compatibility_distance(const Genome& rhs) const
@@ -454,7 +466,10 @@ float Genome::compatibility_distance(const Genome& rhs) const
 
 Genome Genome::crossover(const Genome& other)
 {
-    return impl_->crossover(other);
+    auto g =  impl_->crossover(other);
+    CRIT("Crossover");
+    std::cout << g << "\n";
+    return g;
 }
 
 bool Genome::operator ==(const Genome& other) const

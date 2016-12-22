@@ -3,6 +3,7 @@
 #include "Parameters.hpp"
 #include "Evaluator.hpp"
 #include "Environment.hpp"
+#include "Logger.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -29,9 +30,9 @@ struct Species::Impl
         {
             return genomes_.front();
         }
-        unsigned index = generator_->get_next(genomes_.size());
+        unsigned index = generator_->get_next(genomes_.size() - 1);
         auto genome1 = genomes_.at(index);
-        index = generator_->get_next(genomes_.size());
+        index = generator_->get_next(genomes_.size() - 1);
         auto genome2 = genomes_.at(index);
 
         auto gen = genome1.crossover(genome2);
@@ -61,7 +62,10 @@ struct Species::Impl
 
     void remove_weak_genomes()
     {
-        genomes_.erase(std::remove_if(genomes_.begin(), genomes_.end(), [](const Genome& genome){return genome.get_fitness() == 0;}), genomes_.end());
+        INFO("Genomes before purge: %d", genomes_.size());
+        auto predicate = [](const Genome& genome){return genome.get_fitness() >= 0.9;};
+        genomes_.erase(std::remove_if(genomes_.begin(), genomes_.end(), predicate), genomes_.end());
+        INFO("Genomes after purge: %d", genomes_.size());
     }
 
     std::shared_ptr<RandomGenerator>& generator_;
@@ -127,4 +131,9 @@ Species::Genomes::iterator Species::end()
 void Species::remove_weak_genomes()
 {
     impl_->remove_weak_genomes();
+}
+
+bool Species::empty() const
+{
+    return impl_->genomes_.empty();
 }
