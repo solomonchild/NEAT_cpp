@@ -62,8 +62,28 @@ struct Species::Impl
 
     void remove_weak_genomes()
     {
+        if(genomes_.empty())
+        {
+            INFO("No genomes to purge (empty species)");
+            return;
+        }
+
         INFO("Genomes before purge: %d", genomes_.size());
-        auto predicate = [](const Genome& genome){return genome.get_fitness() >= 0.9;};
+
+        float avg_fitness = 0.0f;
+        for(auto& g: genomes_)
+        {
+            avg_fitness +=  g.get_fitness();
+        }
+        avg_fitness /= genomes_.size();
+        // TODO: use some balancing factor for avg_fitness
+        //avg_fitness *= 1.05;
+
+        INFO("Min: %f", genomes_.front().get_fitness());
+        INFO("Max: %f", genomes_.back().get_fitness());
+
+        INFO("Average fitness: %f", avg_fitness);
+        auto predicate = [avg_fitness](const Genome& genome){ return genome.get_fitness() >= avg_fitness; };
         genomes_.erase(std::remove_if(genomes_.begin(), genomes_.end(), predicate), genomes_.end());
         INFO("Genomes after purge: %d", genomes_.size());
     }

@@ -15,10 +15,13 @@ int main(int argc, char** argv)
         std::array<Inputs, 4> inputs = {Inputs{1, 0}, Inputs{0, 1}, Inputs{0,0}, Inputs{1,1}};
         Pool pool(generator);
         Evaluator eval;
-        Environment::set_log_level(Environment::LogLevel::Debug);
+        Environment::set_log_level(Environment::LogLevel::Info);
 
+        uint64_t iteration = 0;
         while(true)
         {
+            iteration++;
+            INFO("Iteration %lu", iteration);
             for(auto& species : pool)
             {
                 INFO("Next species");
@@ -46,14 +49,17 @@ int main(int argc, char** argv)
             Species::Genomes genomes;
             for(auto& species : pool)
             {
-                species.remove_weak_genomes();
+                if(iteration % 5 == 0)
+                {
+                    species.remove_weak_genomes();
+                }
                 if(species.empty())
                 {
                     continue;
                 }
-                CRIT("Before breed");
+                DEBUG("Before breed");
                 auto genome = species.breed();
-                CRIT("After breed");
+                DEBUG("After breed");
                 genomes.emplace_back(genome);
             }
             for(auto genome : genomes)

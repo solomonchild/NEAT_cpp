@@ -147,7 +147,7 @@ struct Genome::Impl
        gene.is_enabled(false);
 
        gene1.in(gene.in());
-       CRIT("Last neuron before setting to out: %u", last_neuron_);
+       DEBUG("Last neuron before setting to out: %u", last_neuron_);
        gene1.out(last_neuron_);
        gene1.weight(1);
        Environment::inc_innovation_number();
@@ -445,17 +445,17 @@ Genome& Genome::operator=(Genome&& other)
 
 Outputs Genome::evaluate_network(const Inputs& inputs) const
 {
-    std::cout << *this;
+    IF_DEBUG([this](){std::cout << *this;});
     return impl_->evaluate_network(inputs);
 }
 
 void Genome::mutate()
 {
-    CRIT("Before mutate");
-    std::cout << *this << "\n";
+    DEBUG("Before mutate");
+    IF_DEBUG([this](){std::cout << *this << "\n";});
     impl_->mutate();
-    CRIT("After mutate");
-    std::cout << *this << "\n";
+    DEBUG("After mutate");
+    IF_DEBUG([this](){std::cout << *this << "\n";});
 }
 
 float Genome::compatibility_distance(const Genome& rhs) const
@@ -467,8 +467,8 @@ float Genome::compatibility_distance(const Genome& rhs) const
 Genome Genome::crossover(const Genome& other)
 {
     auto g =  impl_->crossover(other);
-    CRIT("Crossover");
-    std::cout << g << "\n";
+    DEBUG("Crossover");
+    IF_DEBUG([&g](){std::cout << g << "\n";});
     return g;
 }
 

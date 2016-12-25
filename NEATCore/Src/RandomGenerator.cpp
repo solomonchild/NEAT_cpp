@@ -13,9 +13,14 @@ struct RandomGenerator::Impl
 
     float get_next(uint16_t rand_max)
     {
-        if(rand_max <= 0)
+        if(rand_max == 0)
         {
-            throw new std::invalid_argument("Maximum random number must be larger than 0");
+            return 0;
+        }
+
+        if(rand_max < 0)
+        {
+            throw new std::invalid_argument("Maximum random number must be LE than 0");
         }
         float next = rand() / static_cast<float>(RAND_MAX) * static_cast<float>(rand_max);
         return next;
