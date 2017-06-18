@@ -32,6 +32,7 @@ public:
     Genomes::iterator begin();
     Genomes::iterator end();
     bool empty() const;
+    size_t size() const;
 
     void remove_weak_genomes();
 private:

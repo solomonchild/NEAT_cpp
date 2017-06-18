@@ -24,7 +24,7 @@ int main(int argc, char** argv)
             INFO("Iteration %lu", iteration);
             for(auto& species : pool)
             {
-                INFO("Next species");
+                //TODO: add species Id
                 for(auto& genome : species)
                 {
                     float max_fitness = 0;
@@ -37,7 +37,6 @@ int main(int argc, char** argv)
                     genome.set_fitness(max_fitness);
                     // TODO: review
                     genome.mutate();
-                    INFO("Fitness: %f", max_fitness);
                     if(max_fitness < 0.5)
                     {
                         INFO("Done.");
@@ -57,10 +56,18 @@ int main(int argc, char** argv)
                 {
                     continue;
                 }
-                DEBUG("Before breed");
+                else
+                {
+                    auto genome = species.breed();
+                    genomes.emplace_back(genome);
+                }
+            }
+            while(pool.size() + genomes.size() < Parameters::population_size)
+            {
+                auto species = pool.at(generator->get_next(pool.number_of_species() - 1));
                 auto genome = species.breed();
-                DEBUG("After breed");
                 genomes.emplace_back(genome);
+
             }
             for(auto genome : genomes)
             {

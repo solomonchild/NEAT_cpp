@@ -125,7 +125,8 @@ struct Genome::Impl
     void mutate_weight()
     {
         auto& gene = get_random_gene();
-        gene.weight(gene.weight() * (1 + Parameters::gene_weight_multiplier));
+        auto coef = generator_->get_next(2);
+        gene.weight(gene.weight() * coef);
     }
 
     void mutate_enable_disable()
@@ -138,7 +139,7 @@ struct Genome::Impl
     {
        if(genes_.size() >= Parameters::genome_size)
        {
-           AERROR("Cannot mutate node. Genome full.");
+           //AERROR("Cannot mutate node. Genome full.");
            return;
        }
        auto& gene = get_random_gene();
@@ -147,7 +148,6 @@ struct Genome::Impl
        gene.is_enabled(false);
 
        gene1.in(gene.in());
-       DEBUG("Last neuron before setting to out: %u", last_neuron_);
        gene1.out(last_neuron_);
        gene1.weight(1);
        Environment::inc_innovation_number();
@@ -161,7 +161,6 @@ struct Genome::Impl
 
        genes_.push_back(gene1);
        genes_.push_back(gene2);
-       CRIT("%s Last neuron: %u", __func__, last_neuron_);
        last_neuron_++;
     }
 
@@ -220,7 +219,6 @@ struct Genome::Impl
         {
             genes_.push_back(gene);
             last_neuron_++;
-            CRIT("%s: Last neuron: %u", __func__, last_neuron_);
         }
     }
 
@@ -228,7 +226,7 @@ struct Genome::Impl
     {
         DEBUG("Mutating");
         // TODO: Probabilities of point and enable/disable mutations
-        float p_of_node_mutate = generator_->get_next(1);
+        float p_of_node_mutate = generator_->get_next();
         if (p_of_node_mutate <= Parameters::node_mutation_chance)
         {
             DEBUG("Will add node gene");

@@ -13,6 +13,7 @@ struct Species::Impl
 {
     Impl(std::shared_ptr<RandomGenerator>& generator)
         :generator_(generator)
+        , id_(ID++)
     {
         // genomes should be added on demand
     }
@@ -30,10 +31,14 @@ struct Species::Impl
         {
             return genomes_.front();
         }
-        unsigned index = generator_->get_next(genomes_.size() - 1);
-        auto genome1 = genomes_.at(index);
-        index = generator_->get_next(genomes_.size() - 1);
-        auto genome2 = genomes_.at(index);
+        unsigned index_1 = generator_->get_next(genomes_.size() - 1);
+        unsigned index_2 = generator_->get_next(genomes_.size() - 1);
+        do {
+            index_2 = generator_->get_next(genomes_.size() - 1);
+        } while(index_1 == index_2);
+
+        auto genome1 = genomes_.at(index_1);
+        auto genome2 = genomes_.at(index_2);
 
         auto gen = genome1.crossover(genome2);
 
@@ -68,29 +73,38 @@ struct Species::Impl
             return;
         }
 
-        INFO("Genomes before purge: %d", genomes_.size());
+        INFO("[%lld] Genomes before purge: %d", id_, genomes_.size());
 
-        float avg_fitness = 0.0f;
-        for(auto& g: genomes_)
-        {
-            avg_fitness +=  g.get_fitness();
-        }
-        avg_fitness /= genomes_.size();
-        // TODO: use some balancing factor for avg_fitness
-        //avg_fitness *= 1.05;
+        auto calculate_avg_fitness = [this] () {
+            float avg_fitness = 0.0f;
+            for(auto& g: genomes_)
+            {
+                avg_fitness +=  g.get_fitness();
+            }
+            avg_fitness /= genomes_.size();
+            // TODO: use some balancing factor for avg_fitness
+            //avg_fitness *= 1.05;
+            return avg_fitness;
+        };
+        float avg_fitness = calculate_avg_fitness();
 
-        INFO("Min: %f", genomes_.front().get_fitness());
-        INFO("Max: %f", genomes_.back().get_fitness());
 
-        INFO("Average fitness: %f", avg_fitness);
-        auto predicate = [avg_fitness](const Genome& genome){ return genome.get_fitness() >= avg_fitness; };
+        INFO("[%lld] Min: %f", id_, genomes_.front().get_fitness());
+        INFO("[%lld] Max: %f", id_, genomes_.back().get_fitness());
+
+        INFO("[%lld] Average fitness: %f", id_, avg_fitness);
+        auto predicate = [avg_fitness](const Genome& genome){ return genome.get_fitness() > avg_fitness; };
         genomes_.erase(std::remove_if(genomes_.begin(), genomes_.end(), predicate), genomes_.end());
-        INFO("Genomes after purge: %d", genomes_.size());
+        INFO("[%lld] Genomes after purge: %d", id_, genomes_.size());
+        INFO("[%lld] Average fitness after purge: %f", id_, calculate_avg_fitness());
     }
 
     std::shared_ptr<RandomGenerator>& generator_;
+    long long id_;
+    static long long ID;
     Genomes genomes_;
 };
+long long Species::Impl::ID = 0;
 
 Species::Species(std::shared_ptr<RandomGenerator>& generator)
     : impl_(new Impl(generator))
@@ -156,4 +170,9 @@ void Species::remove_weak_genomes()
 bool Species::empty() const
 {
     return impl_->genomes_.empty();
+}
+
+size_t Species::size() const
+{
+    return impl_->genomes_.size();
 }

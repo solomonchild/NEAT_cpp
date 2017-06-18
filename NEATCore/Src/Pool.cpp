@@ -29,6 +29,15 @@ struct Pool::Impl
         species_.push_back(Species(generator_));
         species_.back().add_genome(genome);
     }
+    size_t size()
+    {
+        size_t size = 0;
+        for(auto& species : species_)
+        {
+            size += species.size();
+        }
+       return size;
+    }
 
     std::shared_ptr<RandomGenerator> generator_;
     SpeciesVector species_;
@@ -55,4 +64,18 @@ Pool::SpeciesVector::iterator Pool::begin()
 Pool::SpeciesVector::iterator Pool::end()
 {
     return impl_->species_.end();
+}
+size_t Pool::size() const
+{
+    return impl_->size();
+}
+
+Species& Pool::at(size_t index)
+{
+    return impl_->species_[index];
+}
+
+size_t Pool::number_of_species() const
+{
+    return impl_->species_.size();
 }

@@ -18,6 +18,9 @@ public:
 
     SpeciesVector::iterator begin();
     SpeciesVector::iterator end();
+    Species& at(size_t index);
+    size_t number_of_species() const;
+    size_t size() const;
 private:
     struct Impl;
     std::unique_ptr<Impl> impl_;
