@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <map>
 
 
 struct Species::Impl
@@ -29,11 +30,14 @@ struct Species::Impl
         assert(genomes_.size() >= 1);
         if(genomes_.size() == 1)
         {
-            return genomes_.front();
+            Genome gen = genomes_.front();
+            gen.mutate();
+            return gen;
         }
         unsigned index_1 = generator_->get_next(genomes_.size() - 1);
         unsigned index_2 = generator_->get_next(genomes_.size() - 1);
-        do {
+        do
+        {
             index_2 = generator_->get_next(genomes_.size() - 1);
         } while(index_1 == index_2);
 
@@ -99,10 +103,39 @@ struct Species::Impl
         INFO("[%lld] Average fitness after purge: %f", id_, calculate_avg_fitness());
     }
 
+    void remove_stale_genomes()
+    {
+        for(size_t i = 0; i < genomes_.size(); i++)
+        {
+            auto fitness = genomes_[i].get_fitness();
+            if(fitness > top_fitness_)
+            {
+                top_fitness_ = fitness;
+                stale_map_[i] = 0;
+            }
+            else
+            {
+                stale_map_[i] += 1;
+            }
+        }
+        for(size_t i = 0; i < stale_map_.size(); i++)
+        {
+            if(stale_map_[i] > 5)
+            {
+                genomes_.erase(genomes_.begin() + i);
+                stale_map_[i] = 0;
+            }
+
+        }
+
+    }
+
     std::shared_ptr<RandomGenerator>& generator_;
     long long id_;
+    float top_fitness_;
     static long long ID;
     Genomes genomes_;
+    std::map<int, short> stale_map_;
 };
 long long Species::Impl::ID = 0;
 
@@ -175,4 +208,9 @@ bool Species::empty() const
 size_t Species::size() const
 {
     return impl_->genomes_.size();
+}
+
+void Species::remove_stale_genomes()
+{
+    impl_->remove_stale_genomes();
 }

@@ -35,6 +35,7 @@ public:
     size_t size() const;
 
     void remove_weak_genomes();
+    void remove_stale_genomes();
 private:
     struct Impl;
     std::unique_ptr<Impl> impl_;

@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <chrono>
 #include <future>
+#include <fstream>
 
 #include "Environment.hpp"
 
@@ -73,6 +74,15 @@ namespace Logging
         auto t = std::localtime(&time);
         std::string str = print("[%d:%d:%d] %s: ", t->tm_hour, t->tm_min, t->tm_sec, level_to_string(level));
         str += print(format, params...);
-        std::cout << str << '\n';
+        if(Environment::get_log_dest() == Environment::LogDestination::File)
+        {
+            auto file = std::ofstream("out.txt", std::ofstream::binary | std::ofstream::app);
+            file << str << "\n";
+            file.close();
+        }
+        if(Environment::get_log_dest() == Environment::LogDestination::Console)
+        {
+            std::cout << str << '\n';
+        }
     }
 }

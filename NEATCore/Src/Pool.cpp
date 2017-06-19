@@ -1,5 +1,6 @@
 #include "Pool.hpp"
 #include "Parameters.hpp"
+#include <algorithm>
 
 
 //Species should be added on demand
@@ -37,6 +38,10 @@ struct Pool::Impl
             size += species.size();
         }
        return size;
+    }
+    void purge()
+    {
+        species_.erase(std::remove_if(species_.begin(), species_.end(), [](Species& s){return s.empty();}), species_.end());
     }
 
     std::shared_ptr<RandomGenerator> generator_;
@@ -78,4 +83,9 @@ Species& Pool::at(size_t index)
 size_t Pool::number_of_species() const
 {
     return impl_->species_.size();
+}
+
+void Pool::purge()
+{
+    impl_->purge();
 }

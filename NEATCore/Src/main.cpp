@@ -6,6 +6,7 @@
 #include "Evaluator.hpp"
 #include "Logger.hpp"
 #include "Pool.hpp"
+#include <cmath>
 
 int main(int argc, char** argv)
 {
@@ -16,6 +17,7 @@ int main(int argc, char** argv)
         Pool pool(generator);
         Evaluator eval;
         Environment::set_log_level(Environment::LogLevel::Info);
+        Environment::set_log_dest(Environment::LogDestination::Console);
 
         uint64_t iteration = 0;
         while(true)
@@ -27,17 +29,18 @@ int main(int argc, char** argv)
                 //TODO: add species Id
                 for(auto& genome : species)
                 {
-                    float max_fitness = 0;
+                    float min_fitness = 100;
                     for(auto input : inputs)
                     {
                         auto outputs = genome.evaluate_network(input);
                         auto fitness =  eval.get_fitness(outputs, input);
-                        max_fitness = std::max(max_fitness, fitness);
+                        min_fitness = std::min(min_fitness, fitness);
+                        std::cout << min_fitness << '\n';
                     }
-                    genome.set_fitness(max_fitness);
+                    genome.set_fitness(min_fitness);
                     // TODO: review
                     genome.mutate();
-                    if(max_fitness < 0.5)
+                    if(fabs(min_fitness) < 0.5)
                     {
                         INFO("Done.");
                         IF_INFO([&genome](){std::cout << genome;});
@@ -48,19 +51,17 @@ int main(int argc, char** argv)
             Species::Genomes genomes;
             for(auto& species : pool)
             {
+                species.remove_stale_genomes();
                 if(iteration % 5 == 0)
                 {
                     species.remove_weak_genomes();
                 }
-                if(species.empty())
-                {
-                    continue;
-                }
-                else
-                {
-                    auto genome = species.breed();
-                    genomes.emplace_back(genome);
-                }
+            }
+            pool.purge();
+            for(auto& species : pool)
+            {
+                auto genome = species.breed();
+                genomes.emplace_back(genome);
             }
             while(pool.size() + genomes.size() < Parameters::population_size)
             {
@@ -73,6 +74,7 @@ int main(int argc, char** argv)
             {
                 pool.add_genome(genome);
             }
+            pool.purge();
         }
 
     }

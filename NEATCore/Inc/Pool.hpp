@@ -21,6 +21,7 @@ public:
     Species& at(size_t index);
     size_t number_of_species() const;
     size_t size() const;
+    void purge();
 private:
     struct Impl;
     std::unique_ptr<Impl> impl_;
