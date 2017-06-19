@@ -213,7 +213,7 @@ struct Genome::Impl
         Gene gene(generator_);
         gene.in(neuron1.index_);
         gene.out(neuron2.index_);
-        gene.weight(generator_->get_next(2));
+        gene.weight(generator_->get_next());
 
         if(!contains_gene(gene))
         {

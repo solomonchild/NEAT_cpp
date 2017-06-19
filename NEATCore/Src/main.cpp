@@ -29,13 +29,13 @@ int main(int argc, char** argv)
                 //TODO: add species Id
                 for(auto& genome : species)
                 {
-                    float min_fitness = 100;
+                    float min_fitness = 0;
                     for(auto input : inputs)
                     {
                         auto outputs = genome.evaluate_network(input);
                         auto fitness =  eval.get_fitness(outputs, input);
-                        min_fitness = std::min(min_fitness, fitness);
-                        std::cout << min_fitness << '\n';
+                        min_fitness = std::max(min_fitness, fitness);
+                        //std::cout << min_fitness << '\n';
                     }
                     genome.set_fitness(min_fitness);
                     // TODO: review

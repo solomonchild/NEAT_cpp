@@ -108,7 +108,7 @@ struct Species::Impl
         for(size_t i = 0; i < genomes_.size(); i++)
         {
             auto fitness = genomes_[i].get_fitness();
-            if(fitness > top_fitness_)
+            if(fitness < top_fitness_)
             {
                 top_fitness_ = fitness;
                 stale_map_[i] = 0;

@@ -15,7 +15,7 @@ namespace Parameters
 
    const float link_mutation_chance = 0.30;
    const float node_mutation_chance = 0.30;
-   const float weight_mutation_chance = 0.50;
+   const float weight_mutation_chance = 0.3;
    const float enable_disable_mutation_chance = 0.10;
 
    const float gene_weight_multiplier = 0.03;
