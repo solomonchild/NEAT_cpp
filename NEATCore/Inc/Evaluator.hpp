@@ -7,7 +7,7 @@ using Inputs = std::vector<int>;
 
 struct Evaluator
 {
-    float get_fitness(const Outputs&, const Inputs& = {});
+    float get_fitness(const std::vector<Outputs>&, const std::vector<Inputs>& = {});
 
     static const unsigned number_of_inputs_;
     static const unsigned number_of_outputs_;

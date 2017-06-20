@@ -11,6 +11,7 @@ class Pool
 public:
     using SpeciesVector = std::vector<Species>;
     Pool(std::shared_ptr<RandomGenerator>&);
+    void init();
 
     // TODO: use max_population constant
     void add_genome(const Genome& genome);

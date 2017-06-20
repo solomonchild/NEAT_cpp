@@ -1,23 +1,45 @@
 #include <stdexcept>
 #include <sstream>
 #include <cmath>
+#include <cassert>
+#include <iostream>
 
 #include "Evaluator.hpp"
 
 const unsigned Evaluator::number_of_inputs_ = 2;
 const unsigned Evaluator::number_of_outputs_ = 1;
 
-float Evaluator::get_fitness(const Outputs& outputs, const Inputs& inputs)
+float Evaluator::get_fitness(const std::vector<Outputs>& outputs, const std::vector<Inputs>& inputs)
 {
-    if (outputs.size() != number_of_outputs_
-            || inputs.size() != number_of_inputs_)
+    assert(outputs.size() == inputs.size());
+//    if (outputs.size() != number_of_outputs_
+//            || inputs.size() != number_of_inputs_)
+//    {
+//        std::stringstream ss;
+//        ss << "Number of inputs or outputs of provided vector do not match with actual";
+//        throw new std::invalid_argument(ss.str());
+//    }
+    float square = 0;
+    for(unsigned i = 0; i < outputs.size(); i++)
     {
-        std::stringstream ss;
-        ss << "Number of inputs or outputs of provided vector do not match with actual";
-        throw new std::invalid_argument(ss.str());
+        auto o = outputs[i];
+        auto in = inputs[i];
+
+        std::cout << "Outputs: " << o[0] << '\n';
+        auto arg1 = in[0];
+        auto arg2 = in[1];
+        auto expected = arg1 ^ arg2;
+        std::cout << "Expected : " << expected << '\n';
+        auto diff = o[0] - expected;
+        std::cout << "diff: " << diff << '\n';
+        square += std::pow(o[0] - expected, 2);
     }
-    auto arg1 = inputs[0];
-    auto arg2 = inputs[1];
-    auto real_value = arg1 ^ arg2;
-    return std::fabs(outputs[0] - real_value);
+    if(std::isinf(square))
+    {
+        square = 0;
+    }
+    std::cout << "end\n";
+    std::cout << "Square: " << square << '\n';
+    auto ret = 1 - square;
+    return ret;
 }

@@ -13,34 +13,39 @@ int main(int argc, char** argv)
     try
     {
         std::shared_ptr<RandomGenerator> generator = std::make_shared<RandomGenerator>();
-        std::array<Inputs, 4> inputs = {Inputs{1, 0}, Inputs{0, 1}, Inputs{0,0}, Inputs{1,1}};
+        std::vector<Inputs> inputs = {Inputs{1, 0}, Inputs{0, 1}, Inputs{0,0}, Inputs{1,1}};
         Pool pool(generator);
         Evaluator eval;
         Environment::set_log_level(Environment::LogLevel::Info);
-        Environment::set_log_dest(Environment::LogDestination::Console);
+        Environment::set_log_dest(Environment::LogDestination::File);
+        Logging::init();
+
 
         uint64_t iteration = 0;
         while(true)
         {
             iteration++;
-            INFO("Iteration %lu", iteration);
+            INFO("\n\n\nIteration %lu", iteration);
+            if(pool.size() == 0)
+            {
+                pool.init();
+            }
             for(auto& species : pool)
             {
                 //TODO: add species Id
                 for(auto& genome : species)
                 {
-                    float min_fitness = 0;
+                    std::vector<Outputs> all_outputs;
                     for(auto input : inputs)
                     {
-                        auto outputs = genome.evaluate_network(input);
-                        auto fitness =  eval.get_fitness(outputs, input);
-                        min_fitness = std::max(min_fitness, fitness);
-                        //std::cout << min_fitness << '\n';
+                        all_outputs.push_back(genome.evaluate_network(input));
                     }
-                    genome.set_fitness(min_fitness);
+
+                    auto fitness =  eval.get_fitness(all_outputs, inputs);
+                    genome.set_fitness(fitness);
                     // TODO: review
                     genome.mutate();
-                    if(fabs(min_fitness) < 0.5)
+                    if(fabs(fitness) < 0.001)
                     {
                         INFO("Done.");
                         IF_INFO([&genome](){std::cout << genome;});
@@ -62,19 +67,41 @@ int main(int argc, char** argv)
             {
                 auto genome = species.breed();
                 genomes.emplace_back(genome);
-            }
-            while(pool.size() + genomes.size() < Parameters::population_size)
-            {
-                auto& species = pool.at(generator->get_next(pool.number_of_species() - 1));
-                auto genome = species.breed();
-                genomes.emplace_back(genome);
 
+                    std::vector<Outputs> all_outputs;
+                    for(auto input : inputs)
+                    {
+                        all_outputs.push_back(genome.evaluate_network(input));
+                    }
+
+                    auto fitness =  eval.get_fitness(all_outputs, inputs);
+                    genome.set_fitness(fitness);
+                INFO("Fitness for a new genome: %f", fitness);
+            }
+            pool.purge();
+            if(pool.size() != 0)
+            {
+                while(pool.size() + genomes.size() < Parameters::population_size)
+                {
+                    auto& species = pool.at(generator->get_next(pool.number_of_species() - 1));
+                    auto genome = species.breed();
+
+                    std::vector<Outputs> all_outputs;
+                    for(auto input : inputs)
+                    {
+                        all_outputs.push_back(genome.evaluate_network(input));
+                    }
+
+                    auto fitness =  eval.get_fitness(all_outputs, inputs);
+                    genome.set_fitness(fitness);
+                    INFO("Fitness for a new genome: %f", fitness);
+                    genomes.emplace_back(genome);
+                }
             }
             for(auto genome : genomes)
             {
                 pool.add_genome(genome);
             }
-            pool.purge();
         }
 
     }

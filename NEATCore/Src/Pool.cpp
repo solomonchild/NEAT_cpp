@@ -1,6 +1,10 @@
 #include "Pool.hpp"
-#include "Parameters.hpp"
+
 #include <algorithm>
+
+#include "Parameters.hpp"
+#include "Logger.hpp"
+
 
 
 //Species should be added on demand
@@ -8,14 +12,21 @@
 Pool::Pool(std::shared_ptr<RandomGenerator>& generator)
     : generator_(generator)
 {
+    init();
+}
+
+void Pool::init()
+{
     for (unsigned i = 0; i < Parameters::population_size; ++i)
     {
-        add_genome({generator});
+        add_genome({generator_});
     }
 
 }
+
 void Pool::add_genome(const Genome& genome)
 {
+#include <algorithm>
     for(auto& species : species_)
     {
         if(species.will_genome_fit(genome))
@@ -39,7 +50,9 @@ size_t Pool::size() const
 }
 void Pool::purge()
 {
+    INFO("Before purging pool: %d", species_.size());
     species_.erase(std::remove_if(species_.begin(), species_.end(), [](Species& s){return s.empty();}), species_.end());
+    INFO("After purging pool: %d", species_.size());
 }
 
 Pool::SpeciesVector::iterator Pool::begin()

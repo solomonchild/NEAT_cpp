@@ -39,11 +39,20 @@
             index_2 = generator_->get_next(genomes_.size() - 1);
         } while(index_1 == index_2);
 
-        auto genome1 = genomes_.at(index_1);
-        auto genome2 = genomes_.at(index_2);
+        Genome& genome1 = genomes_.at(index_1);
+        Genome& genome2 = genomes_.at(index_2);
 
-        auto gen = genome1.crossover(genome2);
+        Genome gen = genome1.crossover(genome2);
 
+        INFO("G1");
+        INFO_STREAM(genome1);
+
+        INFO("G2");
+        INFO_STREAM(genome2);
+        INFO("Crossover");
+        INFO_STREAM(gen);
+
+        gen = genome1;
         gen.mutate();
         return gen;
     }
@@ -95,7 +104,7 @@
         INFO("[%lld] Max: %f", id_, genomes_.back().get_fitness());
 
         INFO("[%lld] Average fitness: %f", id_, avg_fitness);
-        auto predicate = [avg_fitness](const Genome& genome){ return genome.get_fitness() > avg_fitness; };
+        auto predicate = [avg_fitness](const Genome& genome){ return genome.get_fitness() >= avg_fitness; };
         genomes_.erase(std::remove_if(genomes_.begin(), genomes_.end(), predicate), genomes_.end());
         INFO("[%lld] Genomes after purge: %d", id_, genomes_.size());
         INFO("[%lld] Average fitness after purge: %f", id_, calculate_avg_fitness());

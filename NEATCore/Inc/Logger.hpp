@@ -31,8 +31,30 @@ template <typename T> void IF_ERROR(T f) { if(Environment::get_log_level() <= En
 
 template <typename T> void IF_CRIT(T f) { if(Environment::get_log_level() <= Environment::LogLevel::Critical) { f(); } }
 
+#define INFO_STREAM(t) Logging::put_stream(Environment::LogLevel::Info, t)
+
 namespace Logging
 {
+    inline void init()
+    {
+            std::ofstream file = std::ofstream("out.txt", std::ofstream::trunc);
+            file.close();
+    }
+
+    template<typename T>
+    void put_stream(Environment::LogLevel level, T param)
+    {
+        if(Environment::get_log_dest() == Environment::LogDestination::File)
+        {
+            auto file = std::ofstream("out.txt", std::ofstream::binary | std::ofstream::app);
+            file << param << "\n";
+            file.close();
+        }
+        if(Environment::get_log_dest() == Environment::LogDestination::Console)
+        {
+            std::cout << param << '\n';
+        }
+    }
 
     template<typename... Params>
     void log(Environment::LogLevel level, const std::string& format, Params... params)
