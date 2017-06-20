@@ -25,21 +25,16 @@ float Evaluator::get_fitness(const std::vector<Outputs>& outputs, const std::vec
         auto o = outputs[i];
         auto in = inputs[i];
 
-        std::cout << "Outputs: " << o[0] << '\n';
         auto arg1 = in[0];
         auto arg2 = in[1];
         auto expected = arg1 ^ arg2;
-        std::cout << "Expected : " << expected << '\n';
         auto diff = o[0] - expected;
-        std::cout << "diff: " << diff << '\n';
         square += std::pow(o[0] - expected, 2);
     }
     if(std::isinf(square))
     {
         square = 0;
     }
-    std::cout << "end\n";
-    std::cout << "Square: " << square << '\n';
     auto ret = 1 - square;
     return ret;
 }

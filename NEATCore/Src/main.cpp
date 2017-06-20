@@ -17,7 +17,7 @@ int main(int argc, char** argv)
         Pool pool(generator);
         Evaluator eval;
         Environment::set_log_level(Environment::LogLevel::Info);
-        Environment::set_log_dest(Environment::LogDestination::File);
+        Environment::set_log_dest(Environment::LogDestination::Console);
         Logging::init();
 
 
@@ -28,7 +28,7 @@ int main(int argc, char** argv)
             INFO("\n\n\nIteration %lu", iteration);
             if(pool.size() == 0)
             {
-                pool.init();
+                INFO("Pool is empty");
             }
             for(auto& species : pool)
             {
@@ -45,11 +45,11 @@ int main(int argc, char** argv)
                     genome.set_fitness(fitness);
                     // TODO: review
                     genome.mutate();
-                    std::cout << fitness << '\n';
-                    if(fabs(fitness) < 0.0000001)
+                    INFO("Fitness: %f", fitness);
+                    if(fitness > 0.9)
                     {
                         INFO("Done.");
-                        IF_INFO([&genome](){std::cout << genome;});
+                        INFO_STREAM(genome);
                         return 0;
                     }
                 }

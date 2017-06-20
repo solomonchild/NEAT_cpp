@@ -104,7 +104,7 @@
         INFO("[%lld] Max: %f", id_, genomes_.back().get_fitness());
 
         INFO("[%lld] Average fitness: %f", id_, avg_fitness);
-        auto predicate = [avg_fitness](const Genome& genome){ return genome.get_fitness() >= avg_fitness; };
+        auto predicate = [avg_fitness](const Genome& genome){ return genome.get_fitness() <= avg_fitness; };
         genomes_.erase(std::remove_if(genomes_.begin(), genomes_.end(), predicate), genomes_.end());
         INFO("[%lld] Genomes after purge: %d", id_, genomes_.size());
         INFO("[%lld] Average fitness after purge: %f", id_, calculate_avg_fitness());
@@ -173,7 +173,7 @@
         for(size_t i = 0; i < genomes_.size(); i++)
         {
             auto fitness = genomes_[i].get_fitness();
-            if(fitness < top_fitness_)
+            if(fitness > top_fitness_)
             {
                 top_fitness_ = fitness;
                 stale_map_[i] = 0;
