@@ -14,7 +14,6 @@ public:
 
     // TODO: use max_population constant
     void add_genome(const Genome& genome);
-    ~Pool();
 
     SpeciesVector::iterator begin();
     SpeciesVector::iterator end();
@@ -23,6 +22,6 @@ public:
     size_t size() const;
     void purge();
 private:
-    struct Impl;
-    std::unique_ptr<Impl> impl_;
+    std::shared_ptr<RandomGenerator> generator_;
+    SpeciesVector species_;
 };

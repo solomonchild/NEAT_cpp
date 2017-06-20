@@ -65,7 +65,7 @@ int main(int argc, char** argv)
             }
             while(pool.size() + genomes.size() < Parameters::population_size)
             {
-                auto species = pool.at(generator->get_next(pool.number_of_species() - 1));
+                auto& species = pool.at(generator->get_next(pool.number_of_species() - 1));
                 auto genome = species.breed();
                 genomes.emplace_back(genome);
 

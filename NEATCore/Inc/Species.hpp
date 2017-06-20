@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <map>
 
 #include "Genome.hpp"
 #include "RandomGenerator.hpp"
@@ -23,10 +24,10 @@ public:
     void calculate_fitness();
 
     Species(const Species&);
-    Species& operator=(const Species&);
 
     Species(Species&&);
     Species& operator=(Species&&);
+    Species& operator=(const Species&);
     ~Species();
 
     Genomes::iterator begin();
@@ -37,6 +38,10 @@ public:
     void remove_weak_genomes();
     void remove_stale_genomes();
 private:
-    struct Impl;
-    std::unique_ptr<Impl> impl_;
+    std::shared_ptr<RandomGenerator> generator_;
+    long long id_;
+    float top_fitness_;
+    static long long ID;
+    Genomes genomes_;
+    std::map<int, short> stale_map_;
 };

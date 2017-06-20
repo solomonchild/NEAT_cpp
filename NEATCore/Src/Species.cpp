@@ -10,22 +10,20 @@
 #include <map>
 
 
-struct Species::Impl
-{
-    Impl(std::shared_ptr<RandomGenerator>& generator)
+    Species::Species(std::shared_ptr<RandomGenerator>& generator)
         :generator_(generator)
         , id_(ID++)
     {
         // genomes should be added on demand
     }
 
-    void add_genome(const Genome& genome)
+    void Species::add_genome(const Genome& genome)
     {
         genomes_.push_back(genome);
     }
 
 
-    Genome breed()
+    Genome Species::breed()
     {
         assert(genomes_.size() >= 1);
         if(genomes_.size() == 1)
@@ -50,7 +48,7 @@ struct Species::Impl
         return gen;
     }
 
-    bool will_genome_fit(const Genome& genome)
+    bool Species::will_genome_fit(const Genome& genome)
     {
         auto comparator = [] (const Genome& g1, const Genome& g2)
         {
@@ -69,7 +67,7 @@ struct Species::Impl
     }
 
 
-    void remove_weak_genomes()
+    void Species::remove_weak_genomes()
     {
         if(genomes_.empty())
         {
@@ -103,7 +101,65 @@ struct Species::Impl
         INFO("[%lld] Average fitness after purge: %f", id_, calculate_avg_fitness());
     }
 
-    void remove_stale_genomes()
+    size_t Species::size() const
+    {
+       return genomes_.size();
+    }
+
+    bool Species::empty() const
+    {
+       return genomes_.empty();
+    }
+
+    Species::Species(const Species& other)
+    {
+        this->generator_ = other.generator_;
+        this->id_ = other.id_;
+        this->top_fitness_ = other.top_fitness_;
+        this->genomes_ = other.genomes_;
+        this->stale_map_ = other.stale_map_;
+    }
+
+    Species::Species(Species&& other)
+    {
+        this->generator_ = std::move(other.generator_);
+        this->id_ = other.id_;
+        this->top_fitness_ = other.top_fitness_;
+        this->genomes_ = std::move(other.genomes_);
+        this->stale_map_ = std::move(other.stale_map_);
+    }
+
+    Species& Species::operator=(Species&& other)
+    {
+        this->generator_ = std::move(other.generator_);
+        this->id_ = other.id_;
+        this->top_fitness_ = other.top_fitness_;
+        this->genomes_ = std::move(other.genomes_);
+        this->stale_map_ = std::move(other.stale_map_);
+        return *this;
+    }
+
+    Species& Species::operator=(const Species& other)
+    {
+        this->generator_ = other.generator_;
+        this->id_ = other.id_;
+        this->top_fitness_ = other.top_fitness_;
+        this->genomes_ = other.genomes_;
+        this->stale_map_ = other.stale_map_;
+        return *this;
+    }
+
+    Species::Genomes::iterator Species::begin()
+    {
+        return genomes_.begin();
+    }
+
+    Species::Genomes::iterator Species::end()
+    {
+        return genomes_.end();
+    }
+
+    void Species::remove_stale_genomes()
     {
         for(size_t i = 0; i < genomes_.size(); i++)
         {
@@ -130,87 +186,6 @@ struct Species::Impl
 
     }
 
-    std::shared_ptr<RandomGenerator>& generator_;
-    long long id_;
-    float top_fitness_;
-    static long long ID;
-    Genomes genomes_;
-    std::map<int, short> stale_map_;
-};
-long long Species::Impl::ID = 0;
-
-Species::Species(std::shared_ptr<RandomGenerator>& generator)
-    : impl_(new Impl(generator))
-{
-}
+long long Species::ID = 0;
 
 Species::~Species() = default;
-
-Species::Species(const Species& other)
-{
-    this->impl_ = std::make_unique<Impl>(*other.impl_);
-}
-
-Species& Species::operator=(const Species& other)
-{
-    this->impl_ = std::make_unique<Impl>(*other.impl_);
-    return *this;
-}
-
-Species::Species(Species&& other)
-{
-    this->impl_ = std::make_unique<Impl>(std::move(*other.impl_));
-}
-
-Species& Species::operator=(Species&& other)
-{
-    this->impl_ = std::make_unique<Impl>(std::move(*other.impl_));
-    return *this;
-}
-
-
-void Species::add_genome(const Genome& genome)
-{
-    impl_->add_genome(genome);
-}
-
-
-bool Species::will_genome_fit(const Genome& genome)
-{
-    return impl_->will_genome_fit(genome);
-}
-
-Genome Species::breed()
-{
-    return impl_->breed();
-}
-
-Species::Genomes::iterator Species::begin()
-{
-    return impl_->genomes_.begin();
-}
-
-Species::Genomes::iterator Species::end()
-{
-    return impl_->genomes_.end();
-}
-
-void Species::remove_weak_genomes()
-{
-    impl_->remove_weak_genomes();
-}
-
-bool Species::empty() const
-{
-    return impl_->genomes_.empty();
-}
-
-size_t Species::size() const
-{
-    return impl_->genomes_.size();
-}
-
-void Species::remove_stale_genomes()
-{
-    impl_->remove_stale_genomes();
-}

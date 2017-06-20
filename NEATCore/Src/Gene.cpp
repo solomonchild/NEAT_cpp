@@ -1,9 +1,7 @@
 #include "Gene.hpp"
 #include <iostream>
 
-struct Gene::Impl
-{
-    Impl(std::shared_ptr<RandomGenerator> generator,
+    Gene::Gene(std::shared_ptr<RandomGenerator> generator,
          float weight,
          unsigned innovation,
          unsigned in,
@@ -23,12 +21,12 @@ struct Gene::Impl
         }
     }
 
-    Impl()
+    Gene::Gene()
         :generator_(std::make_shared<RandomGenerator>())
     {
     }
 
-    bool operator ==(const Impl& other) const
+    bool Gene::operator ==(const Gene& other) const
     {
         return weight_ == other.weight_
                 && innovation_ == other.innovation_
@@ -37,118 +35,106 @@ struct Gene::Impl
                 && is_enabled_ == other.is_enabled_;
     }
 
-    std::shared_ptr<RandomGenerator> generator_;
-    float weight_ = 0.0f;
-    unsigned innovation_ = 0;
-    unsigned in_ = 0;
-    unsigned out_ = 0;
-    bool is_enabled_ = true;
-};
-
-
-
-Gene::Gene()
-    :impl_(new Impl)
-{
-}
-
-Gene::Gene(std::shared_ptr<RandomGenerator> generator,
-         float weight,
-         unsigned innovation,
-         unsigned in,
-         unsigned out,
-         bool is_enabled)
-:impl_(new Impl(generator, weight, innovation, in, out, is_enabled))
-{
-}
-
 Gene::Gene(const Gene& other)
 {
-   this->impl_ = std::make_unique<Impl>(*other.impl_);
+    this->generator_ = other.generator_;
+    this->weight_ = other.weight_;
+    this->innovation_ = other.innovation_;
+    this->in_ = other.in_;
+    this->out_ = other.out_;
+    this->is_enabled_ = other.is_enabled_;
 }
 
 Gene& Gene::operator=(const Gene& other)
 {
-    this->impl_ = std::make_unique<Impl>(*other.impl_);
+    this->generator_ = other.generator_;
+    this->weight_ = other.weight_;
+    this->innovation_ = other.innovation_;
+    this->in_ = other.in_;
+    this->out_ = other.out_;
+    this->is_enabled_ = other.is_enabled_;
     return *this;
 }
 
 Gene::Gene(Gene&& other)
 {
-    this->impl_ = std::make_unique<Impl>(std::move(*other.impl_));
+    this->generator_ = std::move(other.generator_);
+    this->weight_ = other.weight_;
+    this->innovation_ = other.innovation_;
+    this->in_ = other.in_;
+    this->out_ = other.out_;
+    this->is_enabled_ = other.is_enabled_;
 }
 
 Gene& Gene::operator=(Gene&& other)
 {
-    this->impl_ = std::make_unique<Impl>(std::move(*other.impl_));
+    this->generator_ = std::move(other.generator_);
+    this->weight_ = other.weight_;
+    this->innovation_ = other.innovation_;
+    this->in_ = other.in_;
+    this->out_ = other.out_;
+    this->is_enabled_ = other.is_enabled_;
     return *this;
 }
 
-Gene::~Gene() = default;
-
 bool Gene::is_enabled() const
 {
-    return impl_->is_enabled_;
+    return is_enabled_;
 }
 
 float Gene::weight() const
 {
-    return impl_->weight_;
+    return weight_;
 }
 
 unsigned Gene::innovation() const
 {
-    return impl_->innovation_;
+    return innovation_;
 }
 
 unsigned Gene::in() const
 {
-    return impl_->in_;
+    return in_;
 }
 
 unsigned Gene::out() const
 {
-    return impl_->out_;
+    return out_;
 }
 
 void Gene::is_enabled(bool val)
 {
-   impl_->is_enabled_ = val;
+   is_enabled_ = val;
 }
 
 void Gene::weight(float val)
 {
-    impl_->weight_ = val;
+    weight_ = val;
 }
 
 void Gene::innovation(unsigned val)
 {
-    impl_->innovation_ = val;
+    innovation_ = val;
 }
 
 void Gene::in(unsigned val)
 {
-    impl_->in_ = val;
+    in_ = val;
 }
 
 void Gene::out(unsigned val)
 {
-    impl_->out_ = val;
+    out_ = val;
 }
 
 std::ostream& operator<<(std::ostream& stream, const Gene& g)
 {
-   stream << "[Is enabled: " << std::boolalpha << g.impl_->is_enabled_ << ", ";
-   stream << "weight: "  << g.impl_->weight_ << ", ";
-   stream << "innovation: "  << g.impl_->innovation_ << ", ";
-   stream << "in: "  << g.impl_->in_ << ", ";
-   stream << "out: "  << g.impl_->out_ << "]";
+   stream << "[Is enabled: " << std::boolalpha << g.is_enabled_ << ", ";
+   stream << "weight: "  << g.weight_ << ", ";
+   stream << "innovation: "  << g.innovation_ << ", ";
+   stream << "in: "  << g.in_ << ", ";
+   stream << "out: "  << g.out_ << "]";
    stream << "\n";
    return stream;
 }
 
-
-bool Gene::operator ==(const Gene& other) const
-{
-    return *impl_ == *other.impl_;
-}

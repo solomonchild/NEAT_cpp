@@ -30,12 +30,12 @@ public:
 
     Genome(Genome&&);
     Genome& operator=(Genome&&);
-    ~Genome();
-
     bool operator ==(const Genome&) const;
 
 private:
-    friend std::ostream& operator<<(std::ostream& stream, const Genome& genome);
-    struct Impl;
-    std::unique_ptr<Impl> impl_;
+    friend std::ostream& operator<<(std::ostream&, const Genome&);
+    std::shared_ptr<RandomGenerator> generator_;
+    unsigned int last_neuron_;
+    Genes genes_;
+    float fitness_;
 };

@@ -22,7 +22,6 @@ public:
 
     Gene(Gene&&);
     Gene& operator=(Gene&&);
-    ~Gene();
 
     bool operator==(const Gene&) const;
 
@@ -44,8 +43,11 @@ public:
 
 
 private:
+    std::shared_ptr<RandomGenerator> generator_;
+    float weight_ = 0.0f;
+    unsigned innovation_ = 0;
+    unsigned in_ = 0;
+    unsigned out_ = 0;
+    bool is_enabled_ = true;
     friend std::ostream& operator<<(std::ostream& stream, const Gene&);
-    struct Impl;
-    std::unique_ptr<Impl> impl_;
-
 };
