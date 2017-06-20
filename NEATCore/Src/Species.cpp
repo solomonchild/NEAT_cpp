@@ -52,7 +52,6 @@
         INFO("Crossover");
         INFO_STREAM(gen);
 
-        gen = genome1;
         gen.mutate();
         return gen;
     }
@@ -71,6 +70,7 @@
         // in ascending order
         std::sort(genomes_.begin(), genomes_.end(), comparator);
         auto fittest_genome = genomes_.back();
+        INFO("Fittest: %f, lowest: %f", genomes_.back().get_fitness(), genomes_.front().get_fitness());
         float distance = fittest_genome.compatibility_distance(genome);
         return distance <= Parameters::distance_threshold;
     }

@@ -1,12 +1,12 @@
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 #include "Parameters.hpp"
 #include "Genome.hpp"
 #include "Evaluator.hpp"
 #include "Logger.hpp"
 #include "Pool.hpp"
-#include <cmath>
 
 int main(int argc, char** argv)
 {
@@ -15,13 +15,13 @@ int main(int argc, char** argv)
         std::shared_ptr<RandomGenerator> generator = std::make_shared<RandomGenerator>();
         std::vector<Inputs> inputs = {Inputs{1, 0}, Inputs{0, 1}, Inputs{0,0}, Inputs{1,1}};
         Pool pool(generator);
-        Evaluator eval;
         Environment::set_log_level(Environment::LogLevel::Info);
         Environment::set_log_dest(Environment::LogDestination::Console);
         Logging::init();
 
-
         uint64_t iteration = 0;
+        Evaluator eval;
+
         while(true)
         {
             iteration++;
@@ -30,9 +30,9 @@ int main(int argc, char** argv)
             {
                 INFO("Pool is empty");
             }
+
             for(auto& species : pool)
             {
-                //TODO: add species Id
                 for(auto& genome : species)
                 {
                     std::vector<Outputs> all_outputs;
@@ -40,12 +40,14 @@ int main(int argc, char** argv)
                     {
                         all_outputs.push_back(genome.evaluate_network(input));
                     }
+                    INFO("Outputs: %f(e. 1), %f (e. 1), %f (e. 0), %f (e. 0)", all_outputs[0][0],
+                            all_outputs[0][1], all_outputs[0][2], all_outputs[0][3]);
 
-                    auto fitness =  eval.get_fitness(all_outputs, inputs);
-                    genome.set_fitness(fitness);
-                    // TODO: review
-                    genome.mutate();
+                    float fitness =  eval.get_fitness(all_outputs, inputs);
                     INFO("Fitness: %f", fitness);
+                    genome.set_fitness(fitness);
+                    genome.mutate();
+
                     if(fitness > 0.9)
                     {
                         INFO("Done.");
@@ -54,6 +56,7 @@ int main(int argc, char** argv)
                     }
                 }
             }
+
             Species::Genomes genomes;
             for(auto& species : pool)
             {
@@ -63,6 +66,7 @@ int main(int argc, char** argv)
                     species.remove_weak_genomes();
                 }
             }
+
             pool.purge();
             for(auto& species : pool)
             {
