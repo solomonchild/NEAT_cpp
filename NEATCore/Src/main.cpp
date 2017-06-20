@@ -45,7 +45,8 @@ int main(int argc, char** argv)
                     genome.set_fitness(fitness);
                     // TODO: review
                     genome.mutate();
-                    if(fabs(fitness) < 0.001)
+                    std::cout << fitness << '\n';
+                    if(fabs(fitness) < 0.0000001)
                     {
                         INFO("Done.");
                         IF_INFO([&genome](){std::cout << genome;});
@@ -73,7 +74,6 @@ int main(int argc, char** argv)
                     {
                         all_outputs.push_back(genome.evaluate_network(input));
                     }
-
                     auto fitness =  eval.get_fitness(all_outputs, inputs);
                     genome.set_fitness(fitness);
                 INFO("Fitness for a new genome: %f", fitness);
