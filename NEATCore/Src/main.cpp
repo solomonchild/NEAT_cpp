@@ -7,11 +7,13 @@
 #include "Evaluator.hpp"
 #include "Logger.hpp"
 #include "Pool.hpp"
+#include "ConfigParser.hpp"
 
 int main(int argc, char** argv)
 {
     try
     {
+
         std::shared_ptr<RandomGenerator> generator = std::make_shared<RandomGenerator>();
         std::vector<Inputs> inputs = {Inputs{1, 0}, Inputs{0, 1}, Inputs{0,0}, Inputs{1,1}};
         Pool pool(generator);
@@ -21,6 +23,13 @@ int main(int argc, char** argv)
 
         uint64_t iteration = 0;
         Evaluator eval;
+        ConfigParser cfg("config.ini");
+        auto map = cfg.parse(Environment::get_parameters());
+        for(auto& m : map)
+        {
+            INFO("Type for %s: %s", m.first.c_str(), Environment::get_typename_for(m.first).c_str());
+        }
+        return 1;
 
         while(true)
         {
