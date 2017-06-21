@@ -23,12 +23,7 @@ int main(int argc, char** argv)
 
         uint64_t iteration = 0;
         Evaluator eval;
-        ConfigParser cfg("config.ini");
-        auto map = cfg.parse(Environment::get_parameters());
-        for(auto& m : map)
-        {
-            INFO("Type for %s: %s", m.first.c_str(), Environment::get_typename_for(m.first).c_str());
-        }
+        Parameters::get_instance().parse();
         return 1;
 
         while(true)
@@ -94,7 +89,7 @@ int main(int argc, char** argv)
             pool.purge();
             if(pool.size() != 0)
             {
-                while(pool.size() + genomes.size() < Parameters::population_size)
+                while(pool.size() + genomes.size() < Parameters::get_instance().population_size())
                 {
                     auto& species = pool.at(generator->get_next(pool.number_of_species() - 1));
                     auto genome = species.breed();

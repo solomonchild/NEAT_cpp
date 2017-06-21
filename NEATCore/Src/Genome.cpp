@@ -43,7 +43,8 @@ Genome::Genome(std::shared_ptr<RandomGenerator> generator, const Genes& genes)
 {
     if(genes.size() == 0)
     {
-        for (Genes::size_type output_index = Parameters::genome_size  - Evaluator::number_of_outputs_; output_index < Parameters::genome_size; ++output_index)
+        for (Genes::size_type output_index = Parameters::get_instance().genome_size()  - Evaluator::number_of_outputs_;
+             output_index < Parameters::get_instance().genome_size(); ++output_index)
         {
             for (Genes::size_type input_index = 0; input_index < Evaluator::number_of_inputs_; ++input_index)
             {
@@ -115,8 +116,8 @@ float Genome::compatibility_distance(const Genome& rhs) const
     avg_weight_diff /= max_genes;
     num_of_disjoint /= max_genes;
     num_of_excess /= max_genes;
-    auto result = Parameters::disjoint_coeff * num_of_disjoint + Parameters::excess_coeff * num_of_excess
-            + Parameters::weights_coeff * avg_weight_diff;
+    auto result = Parameters::get_instance().disjoint_coeff() * num_of_disjoint + Parameters::get_instance().excess_coeff() * num_of_excess
+            + Parameters::get_instance().weights_coeff() * avg_weight_diff;
     return result;
 }
 
@@ -146,7 +147,7 @@ void Genome::mutate()
     };
     auto mutate_node = [=]()
     {
-        if(genes_.size() >= Parameters::genome_size)
+        if(genes_.size() >= Parameters::get_instance().genome_size())
         {
             //AERROR("Cannot mutate node. Genome full.");
             return;
@@ -242,26 +243,26 @@ void Genome::mutate()
     DEBUG("Mutating");
     // TODO: Probabilities of point and enable/disable mutations
     float p_of_node_mutate = generator_->get_next();
-    if (p_of_node_mutate <= Parameters::node_mutation_chance)
+    if (p_of_node_mutate <= Parameters::get_instance().node_mutation_chance())
     {
         DEBUG("Will add node gene");
         mutate_node();
     }
 
     float p_of_link_mutate = generator_->get_next();
-    if(p_of_link_mutate <= Parameters::link_mutation_chance)
+    if(p_of_link_mutate <= Parameters::get_instance().link_mutation_chance())
     {
         DEBUG("Will mutate connection");
         mutate_connection();
     }
     float p_of_enable_disable_mutate = generator_->get_next();
-    if(p_of_enable_disable_mutate <= Parameters::enable_disable_mutation_chance)
+    if(p_of_enable_disable_mutate <= Parameters::get_instance().enable_disable_mutation_chance())
     {
         DEBUG("Will mutate enable/disable");
         mutate_enable_disable();
     }
     float p_of_weight_mutate = generator_->get_next();
-    if(p_of_weight_mutate <= Parameters::weight_mutation_chance)
+    if(p_of_weight_mutate <= Parameters::get_instance().weight_mutation_chance())
     {
         DEBUG("Will mutate weight");
         mutate_weight();
@@ -339,7 +340,7 @@ Outputs Genome::evaluate_network(const Inputs& inputs) const
 
     for(unsigned i = 0; i < Evaluator::number_of_outputs_; ++i)
     {
-        auto index = Parameters::genome_size - Evaluator::number_of_outputs_ + i;
+        auto index = Parameters::get_instance().genome_size() - Evaluator::number_of_outputs_ + i;
         network.emplace_back(Neuron(index));
     }
 
@@ -391,7 +392,7 @@ Outputs Genome::evaluate_network(const Inputs& inputs) const
     {
         // TODO: review/cover
         DEBUG("Is output: %d", n.index_);
-        return n.index_ >= Parameters::genome_size - Evaluator::number_of_outputs_;
+        return n.index_ >= Parameters::get_instance().genome_size() - Evaluator::number_of_outputs_;
     };
 
     for(auto& n : network)

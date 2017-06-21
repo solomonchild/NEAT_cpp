@@ -13,12 +13,12 @@ ConfigParser::ConfigParser(const std::string& name)
 std::string truncate(const std::string& str)
 {
     unsigned int first = 0;
-    while(str[first] == ' ' || str[first] == '\n')
+    while(str[first] == ' ' || str[first] == '\n' || str[first] == '\r')
     {
         first ++;
     }
     unsigned int len = str.size() - first;
-    while(str[first + len - 1] == ' ' || str[first + len - 1] == '\n')
+    while(str[first + len - 1] == ' ' || str[first + len - 1] == '\n' || str[first + len - 1] == '\r')
     {
         len --;
     }

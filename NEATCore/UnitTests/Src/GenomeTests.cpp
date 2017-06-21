@@ -172,9 +172,9 @@ TEST(GenomeTest, EvaluateNetworkTest)
     gene1.weight(0.5);
     gene2.weight(0.3);
     gene1.in(0);
-    gene1.out(Parameters::genome_size - 1);
+    gene1.out(Parameters::get_instance().genome_size() - 1);
     gene2.in(1);
-    gene2.out(Parameters::genome_size - 1);
+    gene2.out(Parameters::get_instance().genome_size() - 1);
 
     Genome genome(generator, {gene1, gene2});
     Outputs expected_outputs = {0.96108983};

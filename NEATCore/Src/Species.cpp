@@ -72,7 +72,7 @@
         auto fittest_genome = genomes_.back();
         INFO("Fittest: %f, lowest: %f", genomes_.back().get_fitness(), genomes_.front().get_fitness());
         float distance = fittest_genome.compatibility_distance(genome);
-        return distance <= Parameters::distance_threshold;
+        return distance <= Parameters::get_instance().distance_threshold();
     }
 
 

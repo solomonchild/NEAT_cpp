@@ -17,7 +17,7 @@ Pool::Pool(std::shared_ptr<RandomGenerator>& generator)
 
 void Pool::init()
 {
-    for (unsigned i = 0; i < Parameters::population_size; ++i)
+    for (unsigned i = 0; i < Parameters::get_instance().population_size(); ++i)
     {
         add_genome({generator_});
     }
