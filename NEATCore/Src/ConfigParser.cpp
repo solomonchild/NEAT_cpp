@@ -40,6 +40,10 @@ std::map<std::string, std::string> ConfigParser::parse(const std::vector<std::st
     while(getline(file, label, '=') && getline(file, value, '\r'))
     {
         label = truncate(label);
+        if(*label.begin() == '#')
+        {
+            continue;
+        }
         value = truncate(value);
         if(std::find(existing_params.begin(), existing_params.end(), label) != existing_params.end())
         {
