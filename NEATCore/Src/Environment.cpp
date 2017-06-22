@@ -2,7 +2,7 @@
 
 unsigned Environment::innovation_number_ = 1;
 Environment::LogLevel Environment::log_level_;
-Environment::LogDestination Environment::log_destination_;
+Environment::LogDestination Environment::log_destination_ = Environment::LogDestination::Console;
 
 void Environment::inc_innovation_number()
 {

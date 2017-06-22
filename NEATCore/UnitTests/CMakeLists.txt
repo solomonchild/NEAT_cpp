@@ -4,6 +4,7 @@ FILE(GLOB SOURCES
     "Src/*.cpp"
 )
 
+INCLUDE_DIRECTORIES(${NEATCore_includes})
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCES}
     ${NEATCore_sources}/Genome.cpp
     ${NEATCore_sources}/Gene.cpp

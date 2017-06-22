@@ -2,6 +2,7 @@
 
 #include "Genome.hpp"
 #include "Parameters.hpp"
+#include "Logger.hpp"
 
 
 namespace
@@ -177,6 +178,7 @@ TEST(GenomeTest, EvaluateNetworkTest)
     gene2.out(Parameters::get_instance().genome_size() - 1);
 
     Genome genome(generator, {gene1, gene2});
+    INFO_STREAM(genome);
     Outputs expected_outputs = {0.96108983};
     auto outputs = genome.evaluate_network({1, 1});
     ASSERT_FLOAT_EQ(expected_outputs[0], outputs[0]);
