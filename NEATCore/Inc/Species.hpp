@@ -38,6 +38,7 @@ public:
     void remove_weak_genomes();
     void remove_stale_genomes();
 private:
+    friend std::ostream& operator<<(std::ostream& stream, const Species& species);
     std::shared_ptr<RandomGenerator> generator_;
     long long id_;
     float top_fitness_;

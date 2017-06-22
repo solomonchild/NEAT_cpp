@@ -198,3 +198,16 @@
 long long Species::ID = 0;
 
 Species::~Species() = default;
+
+
+std::ostream& operator<<(std::ostream& stream, const Species& species)
+{
+    stream << "Species #" << species.id_ << "\n{\n";
+    stream << "Contains: " << species.genomes_.size() << " genomes.\n";
+    for(auto& genome : species.genomes_)
+    {
+        stream << genome;
+    }
+    stream << "}\n";
+    return stream;
+}

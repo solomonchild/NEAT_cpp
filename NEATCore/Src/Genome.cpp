@@ -222,6 +222,7 @@ void Genome::mutate()
         {
             std::swap(neuron1, neuron2);
         }
+        assert(neuron1.index_ < neuron2.index_);
         gene.in(neuron1.index_);
         gene.out(neuron2.index_);
         Environment::inc_innovation_number();
@@ -320,18 +321,12 @@ Outputs Genome::evaluate_network(const Inputs& inputs) const
     Inputs biased_inputs(inputs);
     //pushback bias
     // TODO: fix bias
-    //biased_inputs.push_back(1);
-    auto sigmoid = [] (float x)
-    {
-        float res = 2.0/(1+std::exp(-4.9*x))-1;
-        return res;
-    };
+    biased_inputs.push_back(1);
 
-    // TODO: add sigmoid
     std::vector<Neuron> network;
     Outputs outputs;
 
-    for(unsigned i = 0; i < Evaluator::number_of_inputs_; ++i)
+    for(unsigned i = 0; i < biased_inputs.size(); ++i)
     {
         Neuron n(i);
         n.value_ = biased_inputs[i];
@@ -394,6 +389,19 @@ Outputs Genome::evaluate_network(const Inputs& inputs) const
         DEBUG("Is output: %d", n.index_);
         return n.index_ >= Parameters::get_instance().genome_size() - Evaluator::number_of_outputs_;
     };
+
+    auto sigmoid = [] (float x)
+    {
+        float res = 2.0/(1+std::exp(-4.9*x))-1;
+        return res;
+    };
+
+    auto original_sigmoid = [] (float x)
+    {
+        float res = 1.0/(1+std::exp(-x));
+        return res;
+    };
+    (void) original_sigmoid;
 
     for(auto& n : network)
     {

@@ -24,7 +24,6 @@ int main(int argc, char** argv)
         uint64_t iteration = 0;
         Evaluator eval;
         Parameters::get_instance().parse();
-        return 1;
 
         while(true)
         {
@@ -33,6 +32,7 @@ int main(int argc, char** argv)
             if(pool.size() == 0)
             {
                 INFO("Pool is empty");
+                return -1;
             }
 
             for(auto& species : pool)
@@ -64,11 +64,15 @@ int main(int argc, char** argv)
             Species::Genomes genomes;
             for(auto& species : pool)
             {
+                INFO("Before removing stale and weak");
+                INFO_STREAM(species);
                 species.remove_stale_genomes();
                 if(iteration % 5 == 0)
                 {
                     species.remove_weak_genomes();
                 }
+                INFO("After removing stale and weak");
+                INFO_STREAM(species);
             }
 
             pool.purge();
