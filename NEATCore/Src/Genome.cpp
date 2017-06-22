@@ -39,7 +39,7 @@ Genome::Genome(std::shared_ptr<RandomGenerator> generator, const Genes& genes)
     :generator_(generator)
     , last_neuron_(Evaluator::number_of_inputs_ - 1)
     , genes_(genes)
-    , fitness_(0)
+    , id_(ID++)
 {
     if(genes.size() == 0)
     {
@@ -222,7 +222,7 @@ void Genome::mutate()
         {
             std::swap(neuron1, neuron2);
         }
-        assert(neuron1.index_ < neuron2.index_);
+//        assert(neuron1.index_ < neuron2.index_);
         gene.in(neuron1.index_);
         gene.out(neuron2.index_);
         Environment::inc_innovation_number();
@@ -489,29 +489,36 @@ float Genome::get_fitness() const
 
 std::ostream& operator<<(std::ostream& stream, const Genome& genome)
 {
-    stream << "Genome {\n";
-    stream << "  Last neuron: " << genome.last_neuron_ << '\n';
-    for (auto g : genome.genes_)
-    {
-        stream << "  " << g;
-    }
-    stream << "}\n";
-    stream << "\ndigraph {\n node [shape=record,width=.1,height=.1];"
+//    stream << "Genome {\n";
+//    stream << "  Last neuron: " << genome.last_neuron_ << '\n';
+//    for (auto g : genome.genes_)
+//    {
+//        stream << "  " << g;
+//    }
+//    stream << "}\n";
+    stream << "\ndigraph {\n" << "label = \"fitness: " + std::to_string(genome.get_fitness()) + "\"\n";
+    stream << "node [shape=record,width=.1,height=.1];"
            << "inputs [label = \"<i0>Input1|<i1>Input2\",height=.5];";
     for (unsigned int i = 0; i < genome.genes_.size(); ++i)
     {
         const Gene& g = genome.genes_[i];
         if(g.in() < Evaluator::number_of_inputs_)
         {
-            stream << "inputs:i" << g.in() << "->n" << i <<";\n";
+            stream << "inputs:i" << g.in() << "->n" << g.in() <<";\n";
         }
         std::string out = "Output";
         if(g.out() >= Evaluator::number_of_outputs_)
         {
             out = std::string("n") + std::to_string(g.out());
         }
-        stream << "n" << i <<"->" << out <<"[label=\""<<g.weight() <<"\"];\n";
+        stream << "n" << g.in() <<"->" << out <<"[label=\""<<g.weight() <<"\"];\n";
     }
     stream << "}\n";
     return stream;
 }
+unsigned Genome::id()
+{
+    return id_;
+}
+
+unsigned Genome::ID = 0;

@@ -195,7 +195,7 @@
 
     }
 
-long long Species::ID = 0;
+unsigned Species::ID = 0;
 
 Species::~Species() = default;
 
@@ -210,4 +210,8 @@ std::ostream& operator<<(std::ostream& stream, const Species& species)
     }
     stream << "}\n";
     return stream;
+}
+unsigned Species::id()
+{
+    return id_;
 }

@@ -9,17 +9,17 @@
 
 #include "Environment.hpp"
 
-#define ADEBUG(x, ...) std::async(std::launch::async, [=](){Logging::log(Environment::LogLevel::Debug, x, ##__VA_ARGS__);})
-#define AINFO(x, ...) std::async(std::launch::async, [=](){Logging::log(Environment::LogLevel::Info, x, ##__VA_ARGS__);})
-#define AWARN(x, ...) std::async(std::launch::async, [=](){Logging::log(Environment::LogLevel::Warning, x, ##__VA_ARGS__);})
-#define AERROR(x, ...) std::async(std::launch::async, [=](){Logging::log(Environment::LogLevel::Error, x, ##__VA_ARGS__);})
-#define ACRIT(x, ...) std::async(std::launch::async, [=](){Logging::log(Environment::LogLevel::Critical, x, ##__VA_ARGS__);})
+#define ADEBUG(x, ...) std::async(std::launch::async, [=](){Logger::get_instance()::log(Environment::LogLevel::Debug, x, ##__VA_ARGS__);})
+#define AINFO(x, ...) std::async(std::launch::async, [=](){Logger::get_instance().log(Environment::LogLevel::Info, x, ##__VA_ARGS__);})
+#define AWARN(x, ...) std::async(std::launch::async, [=](){Logger::get_instance().log(Environment::LogLevel::Warning, x, ##__VA_ARGS__);})
+#define AERROR(x, ...) std::async(std::launch::async, [=](){Logger::get_instance().log(Environment::LogLevel::Error, x, ##__VA_ARGS__);})
+#define ACRIT(x, ...) std::async(std::launch::async, [=](){Logger::get_instance().log(Environment::LogLevel::Critical, x, ##__VA_ARGS__);})
 
-#define DEBUG(x, ...) Logging::log(Environment::LogLevel::Debug, x, ##__VA_ARGS__);
-#define INFO(x, ...) Logging::log(Environment::LogLevel::Info, x, ##__VA_ARGS__)
-#define WARN(x, ...) Logging::log(Environment::LogLevel::Warning, x, ##__VA_ARGS__)
-#define ERROR(x, ...) Logging::log(Environment::LogLevel::Error, x, ##__VA_ARGS__)
-#define CRIT(x, ...) Logging::log(Environment::LogLevel::Critical, x, ##__VA_ARGS__)
+#define DEBUG(x, ...) Logger::get_instance().log(Environment::LogLevel::Debug, x, ##__VA_ARGS__);
+#define INFO(x, ...) Logger::get_instance().log(Environment::LogLevel::Info, x, ##__VA_ARGS__)
+#define WARN(x, ...) Logger::get_instance().log(Environment::LogLevel::Warning, x, ##__VA_ARGS__)
+#define ERROR(x, ...) Logger::get_instance().log(Environment::LogLevel::Error, x, ##__VA_ARGS__)
+#define CRIT(x, ...) Logger::get_instance().log(Environment::LogLevel::Critical, x, ##__VA_ARGS__)
 
 template <typename T> void IF_DEBUG(T f) { if(Environment::get_log_level() <= Environment::LogLevel::Debug) { f(); } }
 
@@ -31,14 +31,33 @@ template <typename T> void IF_ERROR(T f) { if(Environment::get_log_level() <= En
 
 template <typename T> void IF_CRIT(T f) { if(Environment::get_log_level() <= Environment::LogLevel::Critical) { f(); } }
 
-#define INFO_STREAM(t) Logging::put_stream(Environment::LogLevel::Info, t)
+#define INFO_STREAM(t) Logger::get_instance().put_stream(Environment::LogLevel::Info, t)
 
-namespace Logging
+class Logger
 {
-    inline void init()
+public:
+    static inline void trunc()
     {
-            std::ofstream file = std::ofstream("out.txt", std::ofstream::trunc);
+            std::ofstream file = std::ofstream(get_instance().filename_, std::ofstream::trunc);
             file.close();
+    }
+
+    static Logger& get_instance()
+    {
+        static Logger logger;
+        return logger;
+    }
+    static Logger& set_filename(const std::string& name)
+    {
+        get_instance().filename_ = name;
+        return get_instance();
+    }
+
+    Logger for_file(const std::string& name)
+    {
+       Logger logger;
+       logger.set_filename(name);
+       return logger;
     }
 
     template<typename T>
@@ -54,6 +73,14 @@ namespace Logging
         {
             std::cout << param << '\n';
         }
+    }
+
+    template<typename T>
+    void dump(const std::string& name, const T& param)
+    {
+        auto file = std::ofstream(name, std::ofstream::binary | std::ofstream::trunc);
+        file << param;
+        file.close();
     }
 
     template<typename... Params>
@@ -107,4 +134,8 @@ namespace Logging
             std::cout << str << '\n';
         }
     }
-}
+private:
+    std::string filename_;
+    Logger() {}
+
+};

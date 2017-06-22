@@ -19,7 +19,8 @@ int main(int argc, char** argv)
         Pool pool(generator);
         Environment::set_log_level(Environment::LogLevel::Info);
         Environment::set_log_dest(Environment::LogDestination::Console);
-        Logging::init();
+        Logger::set_filename("out.txt");
+        Logger::trunc();
 
         uint64_t iteration = 0;
         Evaluator eval;
@@ -51,11 +52,12 @@ int main(int argc, char** argv)
                     INFO("Fitness: %f", fitness);
                     genome.set_fitness(fitness);
                     genome.mutate();
+                    Logger::get_instance().dump(std::to_string(species.id()) + "_" + std::to_string(genome.id())+".dot", genome);
 
                     if(fitness > 0.9)
                     {
                         INFO("Done.");
-                        INFO_STREAM(genome);
+//                        INFO_STREAM(genome);
                         return 0;
                     }
                 }

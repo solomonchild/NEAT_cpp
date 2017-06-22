@@ -35,14 +35,15 @@ public:
     bool empty() const;
     size_t size() const;
 
+    unsigned id();
     void remove_weak_genomes();
     void remove_stale_genomes();
 private:
     friend std::ostream& operator<<(std::ostream& stream, const Species& species);
     std::shared_ptr<RandomGenerator> generator_;
-    long long id_;
+    unsigned id_;
     float top_fitness_;
-    static long long ID;
+    static unsigned ID;
     Genomes genomes_;
     std::map<int, short> stale_map_;
 };

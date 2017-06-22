@@ -28,7 +28,7 @@ private:
     Parameters() {}
 
    size_t population_size_ = 100;
-   size_t genome_size_ = 4;
+   size_t genome_size_ = 15;
    float disjoint_coeff_ = 2.0;
    float excess_coeff_ = 2.0;
    float weights_coeff_ = 0.4;

@@ -31,11 +31,15 @@ public:
     Genome(Genome&&);
     Genome& operator=(Genome&&);
     bool operator ==(const Genome&) const;
+    unsigned id();
 
 private:
     friend std::ostream& operator<<(std::ostream&, const Genome&);
     std::shared_ptr<RandomGenerator> generator_;
     unsigned int last_neuron_;
     Genes genes_;
+    unsigned id_;
+    float top_fitness_;
+    static unsigned ID;
     float fitness_;
 };
