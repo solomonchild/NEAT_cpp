@@ -496,5 +496,22 @@ std::ostream& operator<<(std::ostream& stream, const Genome& genome)
         stream << "  " << g;
     }
     stream << "}\n";
+    stream << "\ndigraph {\n node [shape=record,width=.1,height=.1];"
+           << "inputs [label = \"<i0>Input1|<i1>Input2\",height=.5];";
+    for (unsigned int i = 0; i < genome.genes_.size(); ++i)
+    {
+        const Gene& g = genome.genes_[i];
+        if(g.in() < Evaluator::number_of_inputs_)
+        {
+            stream << "inputs:i" << g.in() << "->n" << i <<";\n";
+        }
+        std::string out = "Output";
+        if(g.out() >= Evaluator::number_of_outputs_)
+        {
+            out = std::string("n") + std::to_string(g.out());
+        }
+        stream << "n" << i <<"->" << out <<"[label=\""<<g.weight() <<"\"];\n";
+    }
+    stream << "}\n";
     return stream;
 }
