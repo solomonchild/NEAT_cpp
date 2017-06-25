@@ -17,8 +17,8 @@ int main(int argc, char** argv)
         std::shared_ptr<RandomGenerator> generator = std::make_shared<RandomGenerator>();
         std::vector<Inputs> inputs = {Inputs{1, 0}, Inputs{0, 1}, Inputs{0,0}, Inputs{1,1}};
         Pool pool(generator);
-        Environment::set_log_level(Environment::LogLevel::Info);
-        Environment::set_log_dest(Environment::LogDestination::Console);
+        Environment::set_log_level(Environment::LogLevel::Debug);
+        Environment::set_log_dest(Environment::LogDestination::File);
         Logger::set_filename("out.txt");
         Logger::trunc();
 
@@ -51,10 +51,10 @@ int main(int argc, char** argv)
                     float fitness =  eval.get_fitness(all_outputs, inputs);
                     INFO("Fitness: %f", fitness);
                     genome.set_fitness(fitness);
-                    genome.mutate();
                     Logger::get_instance().dump(std::to_string(species.id()) + "_" + std::to_string(genome.id())+".dot", genome);
+                    genome.mutate();
 
-                    if(fitness > 0.9)
+                    if(fitness > 0)
                     {
                         INFO("Done.");
 //                        INFO_STREAM(genome);
@@ -90,7 +90,7 @@ int main(int argc, char** argv)
                     }
                     auto fitness =  eval.get_fitness(all_outputs, inputs);
                     genome.set_fitness(fitness);
-                INFO("Fitness for a new genome: %f", fitness);
+                    INFO("Fitness for a new genome: %f", fitness);
             }
             pool.purge();
             if(pool.size() != 0)

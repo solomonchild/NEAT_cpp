@@ -34,6 +34,18 @@ struct Neuron
     float value_;
 };
 
+bool contains_gene (Genome::Genes& genes, const Gene& gene)
+{
+    for (auto g : genes)
+    {
+        if(g.in() == gene.in() && g.out() == gene.out())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 using Neurons = std::vector<Neuron>;
 Genome::Genome(std::shared_ptr<RandomGenerator> generator, const Genes& genes)
     :generator_(generator)
@@ -52,6 +64,7 @@ Genome::Genome(std::shared_ptr<RandomGenerator> generator, const Genes& genes)
                 gene.in(input_index);
                 gene.out(output_index);
                 gene.weight(generator_->get_next());
+                assert(!contains_gene(genes_, gene));
                 genes_.push_back(gene);
             }
         }
@@ -121,17 +134,6 @@ float Genome::compatibility_distance(const Genome& rhs) const
     return result;
 }
 
-bool contains_gene (Genome::Genes& genes, const Gene& gene)
-{
-    for (auto g : genes)
-    {
-        if(g.in() == gene.in() && g.out() == gene.out())
-        {
-            return true;
-        }
-    }
-    return false;
-}
 
 void Genome::mutate()
 {
@@ -170,8 +172,11 @@ void Genome::mutate()
         Environment::inc_innovation_number();
         gene2.innovation(Environment::get_innovation_number());
 
-        genes_.push_back(gene1);
-        genes_.push_back(gene2);
+        if(!contains_gene(genes_, gene1) && !contains_gene(genes_, gene2))
+        {
+            genes_.push_back(gene1);
+            genes_.push_back(gene2);
+        }
     };
     auto get_neurons = [this]()
     {
@@ -225,12 +230,11 @@ void Genome::mutate()
 //        assert(neuron1.index_ < neuron2.index_);
         gene.in(neuron1.index_);
         gene.out(neuron2.index_);
-        Environment::inc_innovation_number();
-        gene.innovation(Environment::get_innovation_number());
-        gene.weight(generator_->get_next(2));
-
         if(!contains_gene(genes_, gene))
         {
+            Environment::inc_innovation_number();
+            gene.innovation(Environment::get_innovation_number());
+            gene.weight(generator_->get_next(2));
             genes_.push_back(gene);
             last_neuron_++;
         }
@@ -286,7 +290,7 @@ Genome Genome::crossover(const Genome& other)
         auto it = innovations.find(innovation);
         if(it == innovations.end())
         {
-//            if(!contains_gene(genes, it->second))
+            if(!contains_gene(genes, it->second))
             {
                 genes.push_back(g);
             }
@@ -297,14 +301,14 @@ Genome Genome::crossover(const Genome& other)
             // TODO: replace with a constant
             if(chance > 0.5 && it->second.is_enabled())
             {
-//                if(!contains_gene(genes, it->second))
+                if(!contains_gene(genes, it->second))
                 {
                     genes.push_back(it->second);
                 }
             }
             else
             {
-                //if(!contains_gene(genes, g))
+                if(!contains_gene(genes, g))
                 {
                     genes.push_back(g);
                 }
@@ -489,13 +493,14 @@ float Genome::get_fitness() const
 
 std::ostream& operator<<(std::ostream& stream, const Genome& genome)
 {
-//    stream << "Genome {\n";
-//    stream << "  Last neuron: " << genome.last_neuron_ << '\n';
-//    for (auto g : genome.genes_)
-//    {
-//        stream << "  " << g;
-//    }
-//    stream << "}\n";
+    stream << "/*Genome {\n";
+    stream << "  Last neuron: " << genome.last_neuron_ << '\n';
+    for (auto g : genome.genes_)
+    {
+        stream << "  " << g;
+    }
+    stream << "}*/\n";
+
     stream << "\ndigraph {\n" << "label = \"fitness: " + std::to_string(genome.get_fitness()) + "\"\n";
     stream << "node [shape=record,width=.1,height=.1];"
            << "inputs [label = \"<i0>Input1|<i1>Input2\",height=.5];";
@@ -504,14 +509,25 @@ std::ostream& operator<<(std::ostream& stream, const Genome& genome)
         const Gene& g = genome.genes_[i];
         if(g.in() < Evaluator::number_of_inputs_)
         {
-            stream << "inputs:i" << g.in() << "->n" << g.in() <<";\n";
+            stream << "inputs:i" << g.in() << "->n" << g.out() <<";\n";
         }
-        std::string out = "Output";
-        if(g.out() >= Evaluator::number_of_outputs_)
+        else
         {
-            out = std::string("n") + std::to_string(g.out());
+            std::string out = "Output";
+            if(g.out() >= Evaluator::number_of_outputs_)
+            {
+                out = std::string("n") + std::to_string(g.out());
+            }
+            if(g.is_enabled())
+            {
+                stream << "n" << g.in() <<"->" << out <<"[label=\""<<g.weight() <<"\"];\n";
+            }
+            else
+            {
+                stream << "n" << g.in() <<"->" << out <<"[style=\"dotted\"];\n";
+
+            }
         }
-        stream << "n" << g.in() <<"->" << out <<"[label=\""<<g.weight() <<"\"];\n";
     }
     stream << "}\n";
     return stream;
