@@ -502,30 +502,39 @@ std::ostream& operator<<(std::ostream& stream, const Genome& genome)
     stream << "}*/\n";
 
     stream << "\ndigraph {\n" << "label = \"fitness: " + std::to_string(genome.get_fitness()) + "\"\n";
-    stream << "node [shape=record,width=.1,height=.1];"
-           << "inputs [label = \"<i0>Input1|<i1>Input2\",height=.5];";
+    stream << "node [shape=record,width=.1,height=.1];\n"
+           << "inputs [label = \"<i0>Input1|<i1>Input2\",height=.5];\n";
     for (unsigned int i = 0; i < genome.genes_.size(); ++i)
     {
         const Gene& g = genome.genes_[i];
         if(g.in() < Evaluator::number_of_inputs_)
         {
-            stream << "inputs:i" << g.in() << "->n" << g.out() <<";\n";
+//            stream << "inputs:i" << g.in() << "->n" << g.out() <<"[label=\""<<g.weight() <<"\"];\n";
         }
-        else
+//        else
         {
-            std::string out = "Output";
-            if(g.out() >= Evaluator::number_of_outputs_)
+            std::string out = std::string("n") + std::to_string(g.out());
+            std::string in = std::to_string(g.in());
+            if(g.in() < Evaluator::number_of_inputs_)
             {
-                out = std::string("n") + std::to_string(g.out());
-            }
-            if(g.is_enabled())
-            {
-                stream << "n" << g.in() <<"->" << out <<"[label=\""<<g.weight() <<"\"];\n";
+                in = "inputs:i" + in;
             }
             else
             {
-                stream << "n" << g.in() <<"->" << out <<"[style=\"dotted\"];\n";
+                in = "n" + in;
+            }
+            if(g.out() >= (Parameters::get_instance().genome_size() - Evaluator::number_of_outputs_))
+            {
+                out = "Output";
+            }
 
+            if(g.is_enabled())
+            {
+                stream << in <<"->" << out <<"[label=\""<<g.weight() <<"\"];\n";
+            }
+            else
+            {
+                stream << in <<"->" << out <<"[style=\"dotted\"];\n";
             }
         }
     }
