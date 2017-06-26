@@ -20,7 +20,6 @@ void Pool::init()
     for (unsigned i = 0; i < Parameters::get_instance().population_size(); ++i)
     {
         Genome g = {generator_};
-        Logger::get_instance().dump(std::string("init_")+std::to_string(i) + ".dot", g);
         add_genome(g);
     }
 

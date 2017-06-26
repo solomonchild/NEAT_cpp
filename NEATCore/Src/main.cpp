@@ -26,6 +26,27 @@ int main(int argc, char** argv)
         Evaluator eval;
         Parameters::get_instance().parse();
 
+        for(auto& species : pool)
+        {
+            for(auto& genome : species)
+            {
+                std::vector<Outputs> all_outputs;
+                for(auto input : inputs)
+                {
+                    all_outputs.push_back(genome.evaluate_network(input));
+                }
+                INFO("Outputs: %f(e. 1), %f (e. 1), %f (e. 0), %f (e. 0)", all_outputs[0][0],
+                        all_outputs[0][1], all_outputs[0][2], all_outputs[0][3]);
+
+                float fitness =  eval.get_fitness(all_outputs, inputs);
+                INFO("Fitness: %f", fitness);
+                genome.set_fitness(fitness);
+                INFO("Genomes' iD: %u", genome.id());
+                Logger::get_instance().dump(std::string("init_")+std::to_string(species.id()) +"_" + std::to_string(genome.id()) + ".dot", genome);
+                INFO(std::string("init_")+std::to_string(genome.id()) + ".dot");
+            }
+        }
+
         while(true)
         {
             iteration++;

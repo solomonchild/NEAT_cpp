@@ -447,6 +447,7 @@ bool Genome::operator ==(const Genome& other) const
 
 Genome::Genome(const Genome& other)
 {
+    this->id_ = other.id_;
     this->generator_ = other.generator_;
     this->last_neuron_ = other.last_neuron_;
     this->genes_ = other.genes_;
@@ -455,6 +456,7 @@ Genome::Genome(const Genome& other)
 
 Genome& Genome::operator=(const Genome& other)
 {
+    this->id_ = other.id_;
     this->generator_ = other.generator_;
     this->last_neuron_ = other.last_neuron_;
     this->genes_ = other.genes_;
@@ -464,6 +466,7 @@ Genome& Genome::operator=(const Genome& other)
 
 Genome::Genome(Genome&& other)
 {
+    this->id_ = other.id_;
     this->generator_ = std::move(other.generator_);
     this->last_neuron_ = other.last_neuron_;
     this->genes_ = std::move(other.genes_);
@@ -472,6 +475,7 @@ Genome::Genome(Genome&& other)
 
 Genome& Genome::operator=(Genome&& other)
 {
+    this->id_ = other.id_;
     this->generator_ = std::move(other.generator_);
     this->last_neuron_ = other.last_neuron_;
     this->genes_ = std::move(other.genes_);
