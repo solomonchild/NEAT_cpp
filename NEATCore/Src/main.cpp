@@ -61,6 +61,7 @@ int main(int argc, char** argv)
             {
                 for(auto& genome : species)
                 {
+                    genome.mutate();
                     std::vector<Outputs> all_outputs;
                     for(auto input : inputs)
                     {
@@ -72,8 +73,7 @@ int main(int argc, char** argv)
                     float fitness =  eval.get_fitness(all_outputs, inputs);
                     INFO("Fitness: %f", fitness);
                     genome.set_fitness(fitness);
-                    Logger::get_instance().dump(std::to_string(species.id()) + "_" + std::to_string(genome.id())+".dot", genome);
-                    genome.mutate();
+//                    Logger::get_instance().dump(std::to_string(species.id()) + "_" + std::to_string(genome.id())+".dot", genome);
 
                     if(fitness > 0)
                     {
@@ -82,6 +82,8 @@ int main(int argc, char** argv)
                         return 0;
                     }
                 }
+                auto& top_genome = *(species.end() - 1);
+                Logger::get_instance().dump(std::to_string(iteration) + "_" + std::to_string(species.id()) + "_" + std::to_string(top_genome.id())+".dot", top_genome);
             }
 
             Species::Genomes genomes;
