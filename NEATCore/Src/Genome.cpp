@@ -227,7 +227,11 @@ void Genome::mutate()
         {
             std::swap(neuron1, neuron2);
         }
-//        assert(neuron1.index_ < neuron2.index_);
+        if(neuron1.index_ > neuron2.index_)
+        {
+            std::swap(neuron1, neuron2);
+        }
+        assert(neuron1.index_ < neuron2.index_);
         gene.in(neuron1.index_);
         gene.out(neuron2.index_);
         if(!contains_gene(genes_, gene))

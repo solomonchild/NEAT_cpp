@@ -9,21 +9,67 @@
 #include "Pool.hpp"
 #include "ConfigParser.hpp"
 
+std::shared_ptr<RandomGenerator> generator = std::make_shared<RandomGenerator>();
+
+void breed_till_full(Pool& pool,std::vector<Inputs>& inputs, Evaluator& eval)
+{
+
+    Species::Genomes genomes;
+    for(auto& species : pool)
+    {
+        auto genome = species.breed();
+
+        std::vector<Outputs> all_outputs;
+        for(auto input : inputs)
+        {
+            all_outputs.push_back(genome.evaluate_network(input));
+        }
+        auto fitness =  eval.get_fitness(all_outputs, inputs);
+        genome.set_fitness(fitness);
+        genomes.emplace_back(genome);
+        INFO("Fitness for a new genome: %f", fitness);
+    }
+
+    if(pool.size() != 0)
+    {
+        while(pool.size() + genomes.size() < Parameters::get_instance().population_size())
+        {
+            Species& species = pool.at(generator->get_next(pool.number_of_species() - 1));
+            auto genome = species.breed();
+
+            std::vector<Outputs> all_outputs;
+            for(auto input : inputs)
+            {
+                all_outputs.push_back(genome.evaluate_network(input));
+            }
+
+            auto fitness =  eval.get_fitness(all_outputs, inputs);
+            genome.set_fitness(fitness);
+            INFO("Fitness for a new genome: %f", fitness);
+            genomes.emplace_back(genome);
+        }
+    }
+    for(auto genome : genomes)
+    {
+        pool.add_genome(genome);
+    }
+
+}
+
 int main(int argc, char** argv)
 {
+    std::vector<Inputs> inputs = {Inputs{1, 0}, Inputs{0, 1}, Inputs{0,0}, Inputs{1,1}};
+    Pool pool(generator);
+    Evaluator eval;
     try
     {
 
-        std::shared_ptr<RandomGenerator> generator = std::make_shared<RandomGenerator>();
-        std::vector<Inputs> inputs = {Inputs{1, 0}, Inputs{0, 1}, Inputs{0,0}, Inputs{1,1}};
-        Pool pool(generator);
-        Environment::set_log_level(Environment::LogLevel::Debug);
+        Environment::set_log_level(Environment::LogLevel::Info);
         Environment::set_log_dest(Environment::LogDestination::File);
         Logger::set_filename("out.txt");
         Logger::trunc();
 
         uint64_t iteration = 0;
-        Evaluator eval;
         Parameters::get_instance().parse();
 
         for(auto& species : pool)
@@ -73,12 +119,10 @@ int main(int argc, char** argv)
                     float fitness =  eval.get_fitness(all_outputs, inputs);
                     INFO("Fitness: %f", fitness);
                     genome.set_fitness(fitness);
-//                    Logger::get_instance().dump(std::to_string(species.id()) + "_" + std::to_string(genome.id())+".dot", genome);
 
                     if(fitness > 0)
                     {
                         INFO("Done.");
-//                        INFO_STREAM(genome);
                         return 0;
                     }
                 }
@@ -86,59 +130,9 @@ int main(int argc, char** argv)
                 Logger::get_instance().dump(std::to_string(iteration) + "_" + std::to_string(species.id()) + "_" + std::to_string(top_genome.id())+".dot", top_genome);
             }
 
-            Species::Genomes genomes;
-            for(auto& species : pool)
-            {
-                INFO("Before removing stale and weak");
-                INFO_STREAM(species);
-                species.remove_stale_genomes();
-                if(iteration % 5 == 0)
-                {
-                    species.remove_weak_genomes();
-                }
-                INFO("After removing stale and weak");
-                INFO_STREAM(species);
-            }
-
-            pool.purge();
-            for(auto& species : pool)
-            {
-                auto genome = species.breed();
-                genomes.emplace_back(genome);
-
-                    std::vector<Outputs> all_outputs;
-                    for(auto input : inputs)
-                    {
-                        all_outputs.push_back(genome.evaluate_network(input));
-                    }
-                    auto fitness =  eval.get_fitness(all_outputs, inputs);
-                    genome.set_fitness(fitness);
-                    INFO("Fitness for a new genome: %f", fitness);
-            }
-            pool.purge();
-            if(pool.size() != 0)
-            {
-                while(pool.size() + genomes.size() < Parameters::get_instance().population_size())
-                {
-                    auto& species = pool.at(generator->get_next(pool.number_of_species() - 1));
-                    auto genome = species.breed();
-
-                    std::vector<Outputs> all_outputs;
-                    for(auto input : inputs)
-                    {
-                        all_outputs.push_back(genome.evaluate_network(input));
-                    }
-
-                    auto fitness =  eval.get_fitness(all_outputs, inputs);
-                    genome.set_fitness(fitness);
-                    INFO("Fitness for a new genome: %f", fitness);
-                    genomes.emplace_back(genome);
-                }
-            }
-            for(auto genome : genomes)
-            {
-                pool.add_genome(genome);
-            }
+            pool.remove_weak_species();
+            pool.remove_stale_species();
+            breed_till_full(pool, inputs, eval);
         }
 
     }

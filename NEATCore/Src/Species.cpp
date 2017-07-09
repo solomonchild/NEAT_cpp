@@ -11,7 +11,8 @@
 
 
     Species::Species(std::shared_ptr<RandomGenerator>& generator)
-        :generator_(generator)
+        : top_fitness_(0)
+        ,generator_(generator)
         , id_(ID++)
     {
         // genomes should be added on demand
@@ -76,8 +77,20 @@
     }
 
 
+    float Species::calculate_fitness() const
+    {
+        float avg_fitness = 0.0f;
+        for(auto& g: genomes_)
+        {
+            avg_fitness +=  g.get_fitness();
+        }
+        avg_fitness /= genomes_.size();
+        return avg_fitness;
+    }
+
     void Species::remove_weak_genomes()
     {
+        rank();
         if(genomes_.empty())
         {
             INFO("No genomes to purge (empty species)");
@@ -93,8 +106,6 @@
                 avg_fitness +=  g.get_fitness();
             }
             avg_fitness /= genomes_.size();
-            // TODO: use some balancing factor for avg_fitness
-            //avg_fitness *= 1.05;
             return avg_fitness;
         };
         float avg_fitness = calculate_avg_fitness();
@@ -168,31 +179,13 @@
         return genomes_.end();
     }
 
-    void Species::remove_stale_genomes()
+    void Species::rank()
     {
-        for(size_t i = 0; i < genomes_.size(); i++)
+        auto comparator = [] (const Genome& g1, const Genome& g2)
         {
-            auto fitness = genomes_[i].get_fitness();
-            if(fitness > top_fitness_)
-            {
-                top_fitness_ = fitness;
-                stale_map_[i] = 0;
-            }
-            else
-            {
-                stale_map_[i] += 1;
-            }
-        }
-        for(size_t i = 0; i < stale_map_.size(); i++)
-        {
-            if(stale_map_[i] > 5)
-            {
-                genomes_.erase(genomes_.begin() + i);
-                stale_map_[i] = 0;
-            }
-
-        }
-
+            return  g1.get_fitness() < g2.get_fitness();
+        };
+        std::sort(genomes_.begin(), genomes_.end(), comparator);
     }
 
 unsigned Species::ID = 0;

@@ -21,7 +21,7 @@ public:
      */
     Genome breed();
     bool will_genome_fit(const Genome&);
-    void calculate_fitness();
+    float calculate_fitness() const;
 
     Species(const Species&);
 
@@ -37,12 +37,12 @@ public:
 
     unsigned id();
     void remove_weak_genomes();
-    void remove_stale_genomes();
+    void rank();
+    float top_fitness_;
 private:
     friend std::ostream& operator<<(std::ostream& stream, const Species& species);
     std::shared_ptr<RandomGenerator> generator_;
     unsigned id_;
-    float top_fitness_;
     static unsigned ID;
     Genomes genomes_;
     std::map<int, short> stale_map_;

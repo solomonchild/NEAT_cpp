@@ -21,8 +21,10 @@ public:
     Species& at(size_t index);
     size_t number_of_species() const;
     size_t size() const;
-    void purge();
+    void remove_weak_species();
+    void remove_stale_species();
 private:
     std::shared_ptr<RandomGenerator> generator_;
     SpeciesVector species_;
+    std::map<int, short> stale_map_;
 };

@@ -39,7 +39,6 @@ private:
     unsigned int last_neuron_;
     Genes genes_;
     unsigned id_;
-    float top_fitness_;
     static unsigned ID;
     float fitness_;
 };
