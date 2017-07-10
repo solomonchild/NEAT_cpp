@@ -35,6 +35,7 @@ void Parameters::parse()
     set(POPULATION_SIZE, population_size_);
     set(GENOME_SIZE, genome_size_);
     set(DISJOINT_COEFF, disjoint_coeff_);
+    set(SURVIVAL_TRESH, survival_tresh_);
     set(EXCESS_COEFF, excess_coeff_);
     set(WEIGHTS_COEFF, weights_coeff_);
     set(DISTANCE_THRESHOLD, distance_threshold_);
@@ -66,6 +67,7 @@ std::vector<std::string> Parameters::get_parameters()
 const std::string Parameters::LOGGING_DESTINATION = "logging_destination";
 const std::string Parameters::POPULATION_SIZE = "population_size";
 const std::string Parameters::GENOME_SIZE = "genome_size";
+const std::string Parameters::SURVIVAL_TRESH = "survival_tresh";
 const std::string Parameters::DISJOINT_COEFF = "disjoint_coeff";
 const std::string Parameters::EXCESS_COEFF = "excess_coeff";
 const std::string Parameters::WEIGHTS_COEFF = "weights_coeff";
@@ -84,6 +86,11 @@ size_t Parameters::population_size()
 size_t Parameters::genome_size()
 {
     return genome_size_;
+}
+
+float Parameters::survival_tresh()
+{
+    return survival_tresh_;
 }
 
 float Parameters::disjoint_coeff()
@@ -139,6 +146,7 @@ std::map<std::string, std::string> Parameters::types_ = {
     {Parameters::LOGGING_DESTINATION, typeid(std::string).name()},
     {Parameters::POPULATION_SIZE, typeid(int).name()},
     {Parameters::GENOME_SIZE, typeid(int).name()},
+    {Parameters::SURVIVAL_TRESH, typeid(float).name()},
     {Parameters::DISJOINT_COEFF, typeid(float).name()},
     {Parameters::EXCESS_COEFF, typeid(float).name()},
     {Parameters::WEIGHTS_COEFF, typeid(float).name()},
@@ -153,6 +161,7 @@ std::vector<std::string> Parameters::parameters_ = {
     Parameters::LOGGING_DESTINATION,
     Parameters::POPULATION_SIZE,
     Parameters::GENOME_SIZE,
+    Parameters::SURVIVAL_TRESH,
     Parameters::DISJOINT_COEFF,
     Parameters::EXCESS_COEFF,
     Parameters::WEIGHTS_COEFF,

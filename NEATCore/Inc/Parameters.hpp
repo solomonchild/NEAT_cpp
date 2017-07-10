@@ -14,6 +14,7 @@ public:
 
     size_t population_size();
     size_t genome_size();
+    float survival_tresh();
     float disjoint_coeff();
     float excess_coeff();
     float weights_coeff();
@@ -29,6 +30,7 @@ private:
 
    size_t population_size_ = 100;
    size_t genome_size_ = 15;
+   float survival_tresh_  = 0.4;
    float disjoint_coeff_ = 2.0;
    float excess_coeff_ = 2.0;
    float weights_coeff_ = 0.4;
@@ -41,6 +43,7 @@ private:
    static const std::string LOGGING_DESTINATION;
    static const std::string POPULATION_SIZE;
    static const std::string GENOME_SIZE;
+   static const std::string SURVIVAL_TRESH;
    static const std::string DISJOINT_COEFF;
    static const std::string EXCESS_COEFF;
    static const std::string WEIGHTS_COEFF;

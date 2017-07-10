@@ -116,8 +116,10 @@
         INFO("[%lld] Min: %f", id_, genomes_.back().get_fitness());
 
         INFO("[%lld] Average fitness: %f", id_, avg_fitness);
-        auto predicate = [avg_fitness](const Genome& genome){ return genome.get_fitness() <= avg_fitness; };
-        genomes_.erase(std::remove_if(genomes_.begin() + genomes_.size() / 2, genomes_.end(), predicate), genomes_.end());
+//        auto predicate = [avg_fitness](const Genome& genome){ return genome.get_fitness() <= avg_fitness; };
+        //genomes_.erase(std::remove_if(genomes_.begin() + genomes_.size() / 2, genomes_.end(), predicate), genomes_.end());
+        float survive = Parameters::get_instance().survival_tresh() * genomes_.size();
+        genomes_.erase(genomes_.begin() + survive, genomes_.end());
         INFO("[%lld] Genomes after purge: %d", id_, genomes_.size());
         INFO("[%lld] Average fitness after purge: %f", id_, calculate_avg_fitness());
         genomes_.push_back(g);
