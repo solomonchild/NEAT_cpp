@@ -406,9 +406,10 @@ Outputs Genome::evaluate_network(const Inputs& inputs) const
 
     auto original_sigmoid = [] (float x)
     {
-        float res = 1.0/(1+std::exp(-x));
+        float res = 1.0/(1+std::exp(-x*4.924273));
         return res;
     };
+    (void) sigmoid;
     (void) original_sigmoid;
 
     for(auto& n : network)
@@ -430,7 +431,7 @@ Outputs Genome::evaluate_network(const Inputs& inputs) const
                 const Neuron& found_neuron = *it;
                 sum += found_neuron.value_ * incoming.weight();
             }
-            n.value_ = sigmoid(sum);
+            n.value_ = original_sigmoid(sum);
         }
         if (is_output(n))
         {
@@ -509,7 +510,8 @@ std::ostream& operator<<(std::ostream& stream, const Genome& genome)
     }
     stream << "}*/\n";
 
-    stream << "\ndigraph {\n" << "label = \"fitness: " + std::to_string(genome.get_fitness()) + "\"\n";
+    stream << "\ndigraph {\n" << "label = \"fitness: " + std::to_string(genome.get_fitness()) + "error: " + std::to_string(genome.get_error()) +
+              " \"\n";
     stream << "node [shape=record,width=.1,height=.1];\n"
            << "inputs [label = \"<i0>Input1|<i1>Input2\",height=.5];\n";
     for (unsigned int i = 0; i < genome.genes_.size(); ++i)
@@ -556,8 +558,17 @@ unsigned Genome::id()
 
 Genome::~Genome()
 {
-    INFO("Genome %d deleted. Fitness: %f", id_, fitness_);
+    INFO("Genome %d deleted. Fitness: %f. Error: %d", id_, fitness_, error_);
 
 }
 
+void Genome::set_error(float error)
+{
+    error_ = error;
+}
+
+float Genome::get_error() const
+{
+    return error_;
+}
 unsigned Genome::ID = 0;

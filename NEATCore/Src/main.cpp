@@ -24,10 +24,11 @@ void breed_till_full(Pool& pool,std::vector<Inputs>& inputs, Evaluator& eval)
         {
             all_outputs.push_back(genome.evaluate_network(input));
         }
-        auto fitness =  eval.get_fitness(all_outputs, inputs);
-        genome.set_fitness(fitness);
+        auto fitness_error =  eval.get_fitness_error(all_outputs, inputs);
+        genome.set_fitness(fitness_error.first);
+        genome.set_error(fitness_error.second);
         genomes.emplace_back(genome);
-        INFO("Fitness for a new genome: %f", fitness);
+        INFO("Fitness for a new genome: %f. Erorr: %f", fitness_error.first, fitness_error.second);
     }
 
     if(pool.size() != 0)
@@ -44,9 +45,10 @@ void breed_till_full(Pool& pool,std::vector<Inputs>& inputs, Evaluator& eval)
                 all_outputs.push_back(genome.evaluate_network(input));
             }
 
-            auto fitness =  eval.get_fitness(all_outputs, inputs);
-            genome.set_fitness(fitness);
-            INFO("Fitness for a new genome: %f", fitness);
+            auto fitness_error =  eval.get_fitness_error(all_outputs, inputs);
+            genome.set_fitness(fitness_error.first);
+            genome.set_error(fitness_error.second);
+            INFO("Fitness for a new genome: %f. Erorr: %f", fitness_error.first, fitness_error.second);
             genomes.emplace_back(genome);
         }
     }
@@ -85,9 +87,10 @@ int main(int argc, char** argv)
                 INFO("Outputs: %f(e. 1), %f (e. 1), %f (e. 0), %f (e. 0)", all_outputs[0][0],
                         all_outputs[0][1], all_outputs[0][2], all_outputs[0][3]);
 
-                float fitness =  eval.get_fitness(all_outputs, inputs);
-                INFO("Fitness: %f", fitness);
-                genome.set_fitness(fitness);
+                auto fitness_error =  eval.get_fitness_error(all_outputs, inputs);
+                INFO("Fitness: %f. Error: %f", fitness_error.first, fitness_error.second);
+                genome.set_fitness(fitness_error.first);
+                genome.set_error(fitness_error.second);
                 INFO("Genomes' iD: %u", genome.id());
                 Logger::get_instance().dump(std::string("init_")+std::to_string(species.id()) +"_" + std::to_string(genome.id()) + ".dot", genome);
                 INFO(std::string("init_")+std::to_string(genome.id()) + ".dot");
@@ -117,11 +120,12 @@ int main(int argc, char** argv)
                     INFO("Outputs: %f(e. 1), %f (e. 1), %f (e. 0), %f (e. 0)", all_outputs[0][0],
                             all_outputs[0][1], all_outputs[0][2], all_outputs[0][3]);
 
-                    float fitness =  eval.get_fitness(all_outputs, inputs);
-                    INFO("Fitness: %f", fitness);
-                    genome.set_fitness(fitness);
+                    auto fitness_error =  eval.get_fitness_error(all_outputs, inputs);
+                    INFO("Fitness: %f. Error: f", fitness_error.first, fitness_error.second);
+                    genome.set_fitness(fitness_error.first);
+                    genome.set_error(fitness_error.second);
 
-                    if(fitness > 0)
+                    if(fitness_error.second < 0.5)
                     {
                         INFO("Done.");
                         return 0;

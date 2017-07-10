@@ -22,6 +22,8 @@ public:
 
     void set_fitness(float);
     float get_fitness() const;
+    void set_error(float);
+    float get_error() const;
 
     Genome(std::shared_ptr<RandomGenerator>, const Genes& = {});
 
@@ -42,4 +44,5 @@ private:
     unsigned id_;
     static unsigned ID;
     float fitness_;
+    float error_;
 };
