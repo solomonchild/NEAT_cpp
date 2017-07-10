@@ -457,6 +457,7 @@ Genome::Genome(const Genome& other)
     this->last_neuron_ = other.last_neuron_;
     this->genes_ = other.genes_;
     this->fitness_ = other.fitness_;
+    this->error_ = other.error_;
 }
 
 Genome& Genome::operator=(const Genome& other)
@@ -466,6 +467,7 @@ Genome& Genome::operator=(const Genome& other)
     this->last_neuron_ = other.last_neuron_;
     this->genes_ = other.genes_;
     this->fitness_ = other.fitness_;
+    this->error_ = other.error_;
     return *this;
 }
 
@@ -476,6 +478,7 @@ Genome::Genome(Genome&& other)
     this->last_neuron_ = other.last_neuron_;
     this->genes_ = std::move(other.genes_);
     this->fitness_ = other.fitness_;
+    this->error_ = other.error_;
 }
 
 Genome& Genome::operator=(Genome&& other)
@@ -485,6 +488,7 @@ Genome& Genome::operator=(Genome&& other)
     this->last_neuron_ = other.last_neuron_;
     this->genes_ = std::move(other.genes_);
     this->fitness_ = other.fitness_;
+    this->error_ = other.error_;
     return *this;
 }
 
