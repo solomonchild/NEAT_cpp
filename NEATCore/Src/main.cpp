@@ -85,7 +85,7 @@ int main(int argc, char** argv)
                     all_outputs.push_back(genome.evaluate_network(input));
                 }
                 INFO("Outputs: %f(e. 1), %f (e. 1), %f (e. 0), %f (e. 0)", all_outputs[0][0],
-                        all_outputs[0][1], all_outputs[0][2], all_outputs[0][3]);
+                        all_outputs[1][0], all_outputs[2][0], all_outputs[3][0]);
 
                 auto fitness_error =  eval.get_fitness_error(all_outputs, inputs);
                 INFO("Fitness: %f. Error: %f", fitness_error.first, fitness_error.second);
