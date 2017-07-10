@@ -554,4 +554,10 @@ unsigned Genome::id()
     return id_;
 }
 
+Genome::~Genome()
+{
+    INFO("Genome %d deleted. Fitness: %f", id_, fitness_);
+
+}
+
 unsigned Genome::ID = 0;

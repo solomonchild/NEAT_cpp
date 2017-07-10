@@ -111,14 +111,17 @@
         float avg_fitness = calculate_avg_fitness();
 
 
-        INFO("[%lld] Min: %f", id_, genomes_.front().get_fitness());
-        INFO("[%lld] Max: %f", id_, genomes_.back().get_fitness());
+        INFO("[%lld] Max: %f", id_, genomes_.front().get_fitness());
+        Genome g = genomes_.front();
+        INFO("[%lld] Min: %f", id_, genomes_.back().get_fitness());
 
         INFO("[%lld] Average fitness: %f", id_, avg_fitness);
         auto predicate = [avg_fitness](const Genome& genome){ return genome.get_fitness() <= avg_fitness; };
-        genomes_.erase(std::remove_if(genomes_.begin(), genomes_.end(), predicate), genomes_.end());
+        genomes_.erase(std::remove_if(genomes_.begin() + genomes_.size() / 2, genomes_.end(), predicate), genomes_.end());
         INFO("[%lld] Genomes after purge: %d", id_, genomes_.size());
         INFO("[%lld] Average fitness after purge: %f", id_, calculate_avg_fitness());
+        genomes_.push_back(g);
+        rank();
     }
 
     size_t Species::size() const
@@ -183,7 +186,7 @@
     {
         auto comparator = [] (const Genome& g1, const Genome& g2)
         {
-            return  g1.get_fitness() < g2.get_fitness();
+            return  g1.get_fitness() > g2.get_fitness();
         };
         std::sort(genomes_.begin(), genomes_.end(), comparator);
     }

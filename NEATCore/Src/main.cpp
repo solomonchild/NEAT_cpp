@@ -36,6 +36,7 @@ void breed_till_full(Pool& pool,std::vector<Inputs>& inputs, Evaluator& eval)
         {
             Species& species = pool.at(generator->get_next(pool.number_of_species() - 1));
             auto genome = species.breed();
+            genome.mutate();
 
             std::vector<Outputs> all_outputs;
             for(auto input : inputs)
@@ -130,8 +131,10 @@ int main(int argc, char** argv)
                 Logger::get_instance().dump(std::to_string(iteration) + "_" + std::to_string(species.id()) + "_" + std::to_string(top_genome.id())+".dot", top_genome);
             }
 
-            pool.remove_weak_species();
+            if(iteration % 5 == 0)
+                pool.remove_weak_species();
             pool.remove_stale_species();
+            pool.purge();
             breed_till_full(pool, inputs, eval);
         }
 

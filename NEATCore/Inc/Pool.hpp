@@ -23,6 +23,7 @@ public:
     size_t size() const;
     void remove_weak_species();
     void remove_stale_species();
+    void purge();
 private:
     std::shared_ptr<RandomGenerator> generator_;
     SpeciesVector species_;

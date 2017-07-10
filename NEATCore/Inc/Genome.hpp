@@ -30,6 +30,7 @@ public:
 
     Genome(Genome&&);
     Genome& operator=(Genome&&);
+    ~Genome();
     bool operator ==(const Genome&) const;
     unsigned id();
 

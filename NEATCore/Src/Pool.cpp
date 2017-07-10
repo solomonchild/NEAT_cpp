@@ -4,6 +4,7 @@
 
 #include "Parameters.hpp"
 #include "Logger.hpp"
+#include <algorithm>
 
 
 
@@ -40,13 +41,19 @@ void Pool::add_genome(const Genome& genome)
     species_.back().add_genome(genome);
 }
 
+void Pool::purge()
+{
+    species_.erase(std::remove_if(species_.begin(), species_.end(), [](Species& s){return s.empty();}), species_.end());
+
+}
+
 void Pool::remove_stale_species()
 {
 
     for(size_t i = 0; i < species_.size(); i++)
     {
         species_[i].rank();
-        auto& genome = *std::prev(species_[i].end());
+        auto& genome = *(species_[i].begin());
         auto fitness = genome.get_fitness();
         if(fitness > species_[i].top_fitness_)
         {
@@ -60,21 +67,20 @@ void Pool::remove_stale_species()
     }
     for(size_t i = 0; i < stale_map_.size(); i++)
     {
-        if(stale_map_[i] > 5)
+        if(stale_map_[i] > 20)
         {
             species_.erase(species_.begin() + i);
             stale_map_[i] = 0;
         }
 
     }
-
 }
 
 void Pool::remove_weak_species()
 {
 
     float total_avg_fitness = 0;
-    for(auto& species : species_)
+    for(Species& species : species_)
     {
         species.remove_weak_genomes();
         total_avg_fitness = species.calculate_fitness();
