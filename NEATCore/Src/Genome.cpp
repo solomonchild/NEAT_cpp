@@ -245,7 +245,7 @@ void Genome::mutate()
     auto mutate_weight = [=]()
     {
         auto& gene = get_random_gene();
-        auto coef = generator_->get_next(4) - 2;
+        auto coef = generator_->get_next(4) - 0;
         gene.weight(gene.weight() * coef);
     };
     DEBUG("Mutating");
@@ -406,8 +406,16 @@ Outputs Genome::evaluate_network(const Inputs& inputs) const
         float res = 1.0/(1+std::exp(-x*4.924273));
         return res;
     };
+    auto tanh = [] (float x)
+    {
+        float res = 2/(1 + std::exp(-2*x)) - 1;
+        return res;
+    };
+
     (void) sigmoid;
     (void) original_sigmoid;
+    (void) tanh;
+    auto activation_func = tanh;
 
     for(auto& n : network)
     {
@@ -428,7 +436,7 @@ Outputs Genome::evaluate_network(const Inputs& inputs) const
                 const Neuron& found_neuron = *it;
                 sum += found_neuron.value_ * incoming.weight();
             }
-            n.value_ = original_sigmoid(sum);
+            n.value_ = activation_func(sum);
         }
         if (is_output(n))
         {
