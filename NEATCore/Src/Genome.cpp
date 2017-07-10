@@ -558,7 +558,7 @@ unsigned Genome::id()
 
 Genome::~Genome()
 {
-    INFO("Genome %d deleted. Fitness: %f. Error: %d", id_, fitness_, error_);
+    INFO("Genome %d deleted. Fitness: %f. Error: %f", id_, fitness_, error_);
 
 }
 
