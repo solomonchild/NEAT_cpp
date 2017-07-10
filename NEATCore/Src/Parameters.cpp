@@ -63,7 +63,6 @@ void Parameters::parse()
 //    node_mutation_chance_ = std::stof(map[P_NODE_MUTATION].c_str());
 //    weight_mutation_chance_ = std::stof(map[P_WEIGHT_MUTATION].c_str());
 //    enable_disable_mutation_chance_ = std::stof(map[P_ENABLE_DISABLE_MUTATION].c_str());
-    std::cout<<"GENome size: " << genome_size_;
 }
 std::vector<std::string> Parameters::get_parameters()
 {

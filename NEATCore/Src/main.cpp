@@ -62,6 +62,7 @@ void breed_till_full(Pool& pool,std::vector<Inputs>& inputs, Evaluator& eval)
 int main(int argc, char** argv)
 {
     std::vector<Inputs> inputs = {Inputs{1, 0}, Inputs{0, 1}, Inputs{0,0}, Inputs{1,1}};
+    Parameters::get_instance().parse();
     Pool pool(generator);
     Evaluator eval;
     try
@@ -73,7 +74,6 @@ int main(int argc, char** argv)
         Logger::trunc();
 
         uint64_t iteration = 0;
-        Parameters::get_instance().parse();
 
         for(auto& species : pool)
         {
