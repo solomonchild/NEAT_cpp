@@ -245,7 +245,7 @@ void Genome::mutate()
     auto mutate_weight = [=]()
     {
         auto& gene = get_random_gene();
-        auto coef = generator_->get_next(2);
+        auto coef = generator_->get_next(4) - 2;
         gene.weight(gene.weight() * coef);
     };
     DEBUG("Mutating");
@@ -328,7 +328,7 @@ Outputs Genome::evaluate_network(const Inputs& inputs) const
     Inputs biased_inputs(inputs);
     //pushback bias
     // TODO: fix bias
-    biased_inputs.push_back(1);
+    //biased_inputs.push_back(1);
 
     std::vector<Neuron> network;
     Outputs outputs;
