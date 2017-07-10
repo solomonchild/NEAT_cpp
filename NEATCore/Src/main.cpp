@@ -121,7 +121,7 @@ int main(int argc, char** argv)
                             all_outputs[0][1], all_outputs[0][2], all_outputs[0][3]);
 
                     auto fitness_error =  eval.get_fitness_error(all_outputs, inputs);
-                    INFO("Fitness: %f. Error: f", fitness_error.first, fitness_error.second);
+                    INFO("Fitness: %f. Error: %f", fitness_error.first, fitness_error.second);
                     genome.set_fitness(fitness_error.first);
                     genome.set_error(fitness_error.second);
 

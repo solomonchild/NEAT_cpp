@@ -151,7 +151,7 @@ void Genome::mutate()
     {
         if(genes_.size() >= Parameters::get_instance().genome_size())
         {
-            //AERROR("Cannot mutate node. Genome full.");
+            ERROR("Cannot mutate node. Genome full.");
             return;
         }
         auto& gene = get_random_gene();
@@ -240,13 +240,12 @@ void Genome::mutate()
             gene.innovation(Environment::get_innovation_number());
             gene.weight(generator_->get_next(2));
             genes_.push_back(gene);
-            last_neuron_++;
         }
     };
     auto mutate_weight = [=]()
     {
         auto& gene = get_random_gene();
-        auto coef = generator_->get_next(1);
+        auto coef = generator_->get_next(2);
         gene.weight(gene.weight() * coef);
     };
     DEBUG("Mutating");
