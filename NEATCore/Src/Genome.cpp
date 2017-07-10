@@ -392,8 +392,6 @@ Outputs Genome::evaluate_network(const Inputs& inputs) const
 
     auto is_output = [this] (const Neuron& n)
     {
-        // TODO: review/cover
-        DEBUG("Is output: %d", n.index_);
         return n.index_ >= Parameters::get_instance().genome_size() - Evaluator::number_of_outputs_;
     };
 

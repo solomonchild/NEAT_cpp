@@ -67,7 +67,7 @@ int main(int argc, char** argv)
     try
     {
 
-        Environment::set_log_level(Environment::LogLevel::Info);
+        Environment::set_log_level(Environment::LogLevel::Debug);
         Environment::set_log_dest(Environment::LogDestination::File);
         Logger::set_filename("out.txt");
         Logger::trunc();

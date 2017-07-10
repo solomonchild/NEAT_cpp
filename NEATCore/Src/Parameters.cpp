@@ -20,13 +20,17 @@ void Parameters::parse()
     {
         if(contains(what))
         {
-            if(std::is_same<decltype(field), int>::value)
+            if(std::is_same<typename std::remove_reference<decltype(field)>::type, int>::value)
             {
                field = std::atoi(map[what].c_str());
             }
-            else if(std::is_same<decltype(field), float>::value)
+            else if(std::is_same<typename std::remove_reference<decltype(field)>::type, float>::value)
             {
                field = std::stof(map[what].c_str());
+            }
+            else if(std::is_same<typename std::remove_reference<decltype(field)>::type, size_t>::value)
+            {
+               field = std::atoi(map[what].c_str());
             }
         }
 
@@ -59,6 +63,7 @@ void Parameters::parse()
 //    node_mutation_chance_ = std::stof(map[P_NODE_MUTATION].c_str());
 //    weight_mutation_chance_ = std::stof(map[P_WEIGHT_MUTATION].c_str());
 //    enable_disable_mutation_chance_ = std::stof(map[P_ENABLE_DISABLE_MUTATION].c_str());
+    std::cout<<"GENome size: " << genome_size_;
 }
 std::vector<std::string> Parameters::get_parameters()
 {
