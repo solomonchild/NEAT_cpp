@@ -28,7 +28,7 @@ void breed_till_full(Pool& pool,std::vector<Inputs>& inputs, Evaluator& eval)
         genome.set_fitness(fitness_error.first);
         genome.set_error(fitness_error.second);
         genomes.emplace_back(genome);
-        INFO("Fitness for a new genome: %f. Erorr: %f", fitness_error.first, fitness_error.second);
+        INFO("Fitness for a new genome: %f. Error: %f", fitness_error.first, fitness_error.second);
     }
 
     if(pool.size() != 0)
@@ -48,7 +48,7 @@ void breed_till_full(Pool& pool,std::vector<Inputs>& inputs, Evaluator& eval)
             auto fitness_error =  eval.get_fitness_error(all_outputs, inputs);
             genome.set_fitness(fitness_error.first);
             genome.set_error(fitness_error.second);
-            INFO("Fitness for a new genome: %f. Erorr: %f", fitness_error.first, fitness_error.second);
+            INFO("Fitness for a new genome: %f. Error: %f", fitness_error.first, fitness_error.second);
             genomes.emplace_back(genome);
         }
     }
