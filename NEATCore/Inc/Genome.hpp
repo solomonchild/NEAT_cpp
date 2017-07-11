@@ -37,6 +37,33 @@ public:
     unsigned id();
 
 private:
+
+    struct Neuron
+    {
+        Neuron(int idx)
+            :index_(idx)
+            , value_(0.0f)
+        {
+        }
+
+        operator int()
+        {
+            return index_;
+        }
+
+        unsigned int index_;
+        Genome::Genes input_;
+        float value_;
+    };
+
+    void mutate_weight();
+    void mutate_connection();
+    using Neurons = std::vector<Neuron>;
+    Neuron get_random_neuron(bool notOutput = false);
+    Neurons get_neurons();
+    void mutate_node();
+    Gene& get_random_gene();
+    void mutate_enable_disable();
     friend std::ostream& operator<<(std::ostream&, const Genome&);
     std::shared_ptr<RandomGenerator> generator_;
     unsigned int last_neuron_;

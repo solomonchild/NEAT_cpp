@@ -23,6 +23,8 @@ public:
     float node_mutation_chance();
     float weight_mutation_chance();
     float enable_disable_mutation_chance();
+    float min_weight();
+    float max_weight();
     static std::vector<std::string> get_parameters();
     static std::string get_typename_for(const std::string& tag);
 private:
@@ -40,6 +42,8 @@ private:
    float node_mutation_chance_ = 0.80;
    float weight_mutation_chance_ = 0.80;
    float enable_disable_mutation_chance_ = 0.10;
+   float min_weight_ = -3;
+   float max_weight_ = -3;
    static const std::string LOGGING_DESTINATION;
    static const std::string POPULATION_SIZE;
    static const std::string GENOME_SIZE;
@@ -52,6 +56,8 @@ private:
    static const std::string P_NODE_MUTATION;
    static const std::string P_WEIGHT_MUTATION;
    static const std::string P_ENABLE_DISABLE_MUTATION;
+   static const std::string MIN_WEIGHT;
+   static const std::string MAX_WEIGHT;
    static std::vector<std::string> parameters_;
    static std::map<std::string, std::string> types_;
 };

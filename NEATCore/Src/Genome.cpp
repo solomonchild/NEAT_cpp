@@ -16,23 +16,6 @@
 
 
 
-struct Neuron
-{
-    Neuron(int idx)
-        :index_(idx)
-        , value_(0.0f)
-    {
-    }
-
-    operator int()
-    {
-        return index_;
-    }
-
-    unsigned int index_;
-    Genome::Genes input_;
-    float value_;
-};
 
 bool contains_gene (Genome::Genes& genes, const Gene& gene)
 {
@@ -46,7 +29,6 @@ bool contains_gene (Genome::Genes& genes, const Gene& gene)
     return false;
 }
 
-using Neurons = std::vector<Neuron>;
 Genome::Genome(std::shared_ptr<RandomGenerator> generator, const Genes& genes)
     :generator_(generator)
     , last_neuron_(Evaluator::number_of_inputs_ - 1)
@@ -135,119 +117,128 @@ float Genome::compatibility_distance(const Genome& rhs) const
 }
 
 
+Gene& Genome::get_random_gene()
+{
+    int index = generator_->get_next(genes_.size() - 1);
+    return genes_[index];
+}
+
+void Genome::mutate_enable_disable()
+{
+    auto& gene = get_random_gene();
+    gene.is_enabled(!gene.is_enabled());
+}
+
+void Genome::mutate_node()
+{
+    if(genes_.size() >= Parameters::get_instance().genome_size())
+    {
+        ERROR("Cannot mutate node. Genome full.");
+        return;
+    }
+    auto& gene = get_random_gene();
+    Gene gene1(gene);
+    Gene gene2(gene);
+    last_neuron_++;
+    gene.is_enabled(false);
+
+    gene1.in(gene.in());
+    gene1.out(last_neuron_);
+    gene1.weight(1);
+    Environment::inc_innovation_number();
+    gene1.innovation(Environment::get_innovation_number());
+
+    gene2.in(last_neuron_);
+    gene2.out(gene.out());
+    gene2.weight(gene.weight());
+    Environment::inc_innovation_number();
+    gene2.innovation(Environment::get_innovation_number());
+
+    if(!contains_gene(genes_, gene1) && !contains_gene(genes_, gene2))
+    {
+        genes_.push_back(gene1);
+        genes_.push_back(gene2);
+    }
+}
+
+Genome::Neurons Genome::get_neurons()
+{
+    Neurons neurons;
+    for (auto g : genes_)
+    {
+        if(std::find(neurons.begin(), neurons.end(), g.in()) == neurons.end())
+        {
+            neurons.push_back(g.in());
+        }
+        if(std::find(neurons.begin(), neurons.end(), g.out()) == neurons.end())
+        {
+            neurons.push_back(g.out());
+        }
+    }
+    std::sort(neurons.begin(), neurons.end(), [](Neuron& n1, Neuron& n2){return n1.index_ < n2.index_;});
+    return neurons;
+}
+
+Genome::Neuron Genome::get_random_neuron(bool notOutput)
+{
+    auto neurons = get_neurons();
+    int index = 0;
+    if(notOutput)
+    {
+        index = generator_->get_next(neurons.size() - 1 - Evaluator::number_of_outputs_);
+    }
+    else
+    {
+        index = generator_->get_next(neurons.size() - 1);
+    }
+    return neurons[index];
+}
+
+void Genome::mutate_connection()
+{
+    Neuron neuron1 = get_random_neuron(true);
+    Neuron neuron2 = get_random_neuron();
+    Gene gene(generator_);
+
+    if(neuron1.index_ <= Evaluator::number_of_inputs_ && neuron2.index_ <= Evaluator::number_of_inputs_)
+    {
+        return;
+    }
+    if(neuron1.index_ == neuron2.index_)
+    {
+        return;
+    }
+    if(neuron2.index_ <= Evaluator::number_of_inputs_ )
+    {
+        std::swap(neuron1, neuron2);
+    }
+    if(neuron1.index_ > neuron2.index_)
+    {
+        std::swap(neuron1, neuron2);
+    }
+    assert(neuron1.index_ < neuron2.index_);
+    gene.in(neuron1.index_);
+    gene.out(neuron2.index_);
+    if(!contains_gene(genes_, gene))
+    {
+        Environment::inc_innovation_number();
+        gene.innovation(Environment::get_innovation_number());
+        gene.weight(generator_->get_next(2));
+        genes_.push_back(gene);
+    }
+}
+
+void Genome::mutate_weight()
+{
+    auto& gene = get_random_gene();
+    auto min_weight = Parameters::get_instance().min_weight();
+    auto max_weight = Parameters::get_instance().max_weight();
+    auto coef = generator_->get_next(max_weight - min_weight) + min_weight;
+    gene.weight(gene.weight() * coef);
+}
+
 void Genome::mutate()
 {
-    auto get_random_gene = [this]() -> Gene&
-    {
-        int index = generator_->get_next(genes_.size() - 1);
-        return genes_[index];
-    };
-    auto mutate_enable_disable = [=]()
-    {
-        auto& gene = get_random_gene();
-        gene.is_enabled(!gene.is_enabled());
-    };
-    auto mutate_node = [=]()
-    {
-        if(genes_.size() >= Parameters::get_instance().genome_size())
-        {
-            ERROR("Cannot mutate node. Genome full.");
-            return;
-        }
-        auto& gene = get_random_gene();
-        Gene gene1(gene);
-        Gene gene2(gene);
-        last_neuron_++;
-        gene.is_enabled(false);
-
-        gene1.in(gene.in());
-        gene1.out(last_neuron_);
-        gene1.weight(1);
-        Environment::inc_innovation_number();
-        gene1.innovation(Environment::get_innovation_number());
-
-        gene2.in(last_neuron_);
-        gene2.out(gene.out());
-        gene2.weight(gene.weight());
-        Environment::inc_innovation_number();
-        gene2.innovation(Environment::get_innovation_number());
-
-        if(!contains_gene(genes_, gene1) && !contains_gene(genes_, gene2))
-        {
-            genes_.push_back(gene1);
-            genes_.push_back(gene2);
-        }
-    };
-    auto get_neurons = [this]()
-    {
-        Neurons neurons;
-        for (auto g : genes_)
-        {
-            if(std::find(neurons.begin(), neurons.end(), g.in()) == neurons.end())
-            {
-                neurons.push_back(g.in());
-            }
-            if(std::find(neurons.begin(), neurons.end(), g.out()) == neurons.end())
-            {
-                neurons.push_back(g.out());
-            }
-        }
-        std::sort(neurons.begin(), neurons.end(), [](Neuron& n1, Neuron& n2){return n1.index_ < n2.index_;});
-        return neurons;
-    };
-    auto get_random_neuron = [=](bool notOutput = false)
-    {
-        auto neurons = get_neurons();
-        int index = 0;
-        if(notOutput)
-        {
-            index = generator_->get_next(neurons.size() - 1 - Evaluator::number_of_outputs_);
-        }
-        else
-        {
-            index = generator_->get_next(neurons.size() - 1);
-        }
-        return neurons[index];
-    };
-    auto mutate_connection = [=]()
-    {
-        Neuron neuron1 = get_random_neuron(true);
-        Neuron neuron2 = get_random_neuron();
-        Gene gene(generator_);
-
-        if(neuron1.index_ <= Evaluator::number_of_inputs_ && neuron2.index_ <= Evaluator::number_of_inputs_)
-        {
-            return;
-        }
-        if(neuron1.index_ == neuron2.index_)
-        {
-            return;
-        }
-        if(neuron2.index_ <= Evaluator::number_of_inputs_ )
-        {
-            std::swap(neuron1, neuron2);
-        }
-        if(neuron1.index_ > neuron2.index_)
-        {
-            std::swap(neuron1, neuron2);
-        }
-        assert(neuron1.index_ < neuron2.index_);
-        gene.in(neuron1.index_);
-        gene.out(neuron2.index_);
-        if(!contains_gene(genes_, gene))
-        {
-            Environment::inc_innovation_number();
-            gene.innovation(Environment::get_innovation_number());
-            gene.weight(generator_->get_next(2));
-            genes_.push_back(gene);
-        }
-    };
-    auto mutate_weight = [=]()
-    {
-        auto& gene = get_random_gene();
-        auto coef = generator_->get_next(4) - 0;
-        gene.weight(gene.weight() * coef);
-    };
     DEBUG("Mutating");
     // TODO: Probabilities of point and enable/disable mutations
     float p_of_node_mutate = generator_->get_next();

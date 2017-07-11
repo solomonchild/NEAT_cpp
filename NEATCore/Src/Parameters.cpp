@@ -47,22 +47,8 @@ void Parameters::parse()
     set(P_NODE_MUTATION, node_mutation_chance_);
     set(P_WEIGHT_MUTATION, weight_mutation_chance_);
     set(P_ENABLE_DISABLE_MUTATION, enable_disable_mutation_chance_);
-//    if(contains(map, POPULATION_SIZE))
-//        population_size_ = std::atoi(map[POPULATION_SIZE].c_str());
-
-//    if(contains(map, GENOME_SIZE))
-//        genome_size_ = std::atoi(map[GENOME_SIZE].c_str());
-//    if(contains(map, DISJOINT_COEFF))
-//        disjoint_coeff_ = std::stof(map[DISJOINT_COEFF].c_str());
-//    if(contains(map, EXCESS_COEFF))
-//        excess_coeff_ = std::stof(map[EXCESS_COEFF].c_str());
-//    if(contains(map, WEIGHTS_COEFF))
-//        weights_coeff_ = std::stof(map[WEIGHTS_COEFF].c_str());
-//    distance_threshold_ = std::stof(map[DISTANCE_THRESHOLD].c_str());
-//    link_mutation_chance_ = std::stof(map[P_LINK_MUTATION].c_str());
-//    node_mutation_chance_ = std::stof(map[P_NODE_MUTATION].c_str());
-//    weight_mutation_chance_ = std::stof(map[P_WEIGHT_MUTATION].c_str());
-//    enable_disable_mutation_chance_ = std::stof(map[P_ENABLE_DISABLE_MUTATION].c_str());
+    set(MIN_WEIGHT, min_weight_);
+    set(MAX_WEIGHT, max_weight_);
 }
 std::vector<std::string> Parameters::get_parameters()
 {
@@ -81,6 +67,9 @@ const std::string Parameters::P_LINK_MUTATION = "link_mutation_chance";
 const std::string Parameters::P_NODE_MUTATION = "node_mutation_chance";
 const std::string Parameters::P_WEIGHT_MUTATION = "weight_mutation_chance";
 const std::string Parameters::P_ENABLE_DISABLE_MUTATION = "enable_disable_mutation_chance";
+
+const std::string Parameters::MIN_WEIGHT = "min_weight";
+const std::string Parameters::MAX_WEIGHT = "max_weight";
 
 size_t Parameters::population_size()
 {
@@ -137,29 +126,15 @@ float Parameters::enable_disable_mutation_chance()
    return enable_disable_mutation_chance_;
 }
 
-std::string Parameters::get_typename_for(const std::string& tag)
+float Parameters::min_weight()
 {
-    if(types_.find(tag) == types_.end())
-    {
-        return "null";
-    }
-    return types_[tag];
+   return min_weight_;
 }
-std::map<std::string, std::string> Parameters::types_ = {
 
-    {Parameters::LOGGING_DESTINATION, typeid(std::string).name()},
-    {Parameters::POPULATION_SIZE, typeid(int).name()},
-    {Parameters::GENOME_SIZE, typeid(int).name()},
-    {Parameters::SURVIVAL_TRESH, typeid(float).name()},
-    {Parameters::DISJOINT_COEFF, typeid(float).name()},
-    {Parameters::EXCESS_COEFF, typeid(float).name()},
-    {Parameters::WEIGHTS_COEFF, typeid(float).name()},
-    {Parameters::DISTANCE_THRESHOLD, typeid(float).name()},
-    {Parameters::P_LINK_MUTATION, typeid(float).name()},
-    {Parameters::P_NODE_MUTATION, typeid(float).name()},
-    {Parameters::P_WEIGHT_MUTATION, typeid(float).name()},
-    {Parameters::P_ENABLE_DISABLE_MUTATION, typeid(float).name()}
-};
+float Parameters::max_weight()
+{
+   return max_weight_;
+}
 
 std::vector<std::string> Parameters::parameters_ = {
     Parameters::LOGGING_DESTINATION,
@@ -174,4 +149,6 @@ std::vector<std::string> Parameters::parameters_ = {
     Parameters::P_NODE_MUTATION,
     Parameters::P_WEIGHT_MUTATION,
     Parameters::P_ENABLE_DISABLE_MUTATION,
+    Parameters::MIN_WEIGHT,
+    Parameters::MAX_WEIGHT,
 };
