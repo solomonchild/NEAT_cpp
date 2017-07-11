@@ -44,15 +44,6 @@
         Genome& genome2 = genomes_.at(index_2);
 
         Genome gen = genome1.crossover(genome2);
-
-        INFO("G1");
-        INFO_STREAM(genome1);
-
-        INFO("G2");
-        INFO_STREAM(genome2);
-        INFO("Crossover");
-        INFO_STREAM(gen);
-
         gen.mutate();
         return gen;
     }

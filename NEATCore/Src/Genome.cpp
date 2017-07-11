@@ -358,13 +358,11 @@ Outputs Genome::evaluate_network(const Inputs& inputs) const
     {
         if(std::find(network.begin(), network.end(), g.out()) == network.end())
         {
-            DEBUG("Emplacing %d(out)", g.out());
             network.emplace_back(Neuron (g.out()));
         }
 
         if(std::find(network.begin(), network.end(), g.in()) == network.end())
         {
-            DEBUG("Emplacing %d(in)", g.in());
             network.emplace_back(Neuron (g.in()));
         }
 
@@ -431,7 +429,6 @@ Outputs Genome::evaluate_network(const Inputs& inputs) const
                 };
                 auto it = std::find_if(network.begin(), network.end(), find_in_neuron);
 
-                DEBUG("Will find neuron with index %d", incoming.in());
                 assert(it != network.end());
                 const Neuron& found_neuron = *it;
                 sum += found_neuron.value_ * incoming.weight();
@@ -526,40 +523,34 @@ std::ostream& operator<<(std::ostream& stream, const Genome& genome)
     for (unsigned int i = 0; i < genome.genes_.size(); ++i)
     {
         const Gene& g = genome.genes_[i];
+        std::string out = std::string("n") + std::to_string(g.out());
+        std::string in = std::to_string(g.in());
         if(g.in() < Evaluator::number_of_inputs_)
         {
-//            stream << "inputs:i" << g.in() << "->n" << g.out() <<"[label=\""<<g.weight() <<"\"];\n";
+            in = "inputs:i" + in;
         }
-//        else
+        else
         {
-            std::string out = std::string("n") + std::to_string(g.out());
-            std::string in = std::to_string(g.in());
-            if(g.in() < Evaluator::number_of_inputs_)
-            {
-                in = "inputs:i" + in;
-            }
-            else
-            {
-                in = "n" + in;
-            }
-            if(g.out() >= (Parameters::get_instance().genome_size() - Evaluator::number_of_outputs_))
-            {
-                out = "Output";
-            }
+            in = "n" + in;
+        }
+        if(g.out() >= (Parameters::get_instance().genome_size() - Evaluator::number_of_outputs_))
+        {
+            out = "Output";
+        }
 
-            if(g.is_enabled())
-            {
-                stream << in <<"->" << out <<"[label=\""<<g.weight() <<"\"];\n";
-            }
-            else
-            {
-                stream << in <<"->" << out <<"[style=\"dotted\"];\n";
-            }
+        if(g.is_enabled())
+        {
+            stream << in <<"->" << out <<"[label=\""<<g.weight() <<"\"];\n";
+        }
+        else
+        {
+            stream << in <<"->" << out <<"[style=\"dotted\"];\n";
         }
     }
     stream << "}\n";
     return stream;
 }
+
 unsigned Genome::id()
 {
     return id_;
