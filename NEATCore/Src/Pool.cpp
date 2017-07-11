@@ -67,7 +67,7 @@ void Pool::remove_stale_species()
     }
     for(size_t i = 0; i < stale_map_.size(); i++)
     {
-        if(stale_map_[i] > 20)
+        if(stale_map_[i] > Parameters::get_instance().staleness())
         {
             species_.erase(species_.begin() + i);
             stale_map_[i] = 0;

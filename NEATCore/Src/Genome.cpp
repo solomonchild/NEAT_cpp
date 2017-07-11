@@ -200,7 +200,7 @@ void Genome::mutate_connection()
     Neuron neuron2 = get_random_neuron();
     Gene gene(generator_);
 
-    if(neuron1.index_ <= Evaluator::number_of_inputs_ && neuron2.index_ <= Evaluator::number_of_inputs_)
+    if(neuron1.index_ <= Evaluator::number_of_inputs_ || neuron2.index_ <= Evaluator::number_of_inputs_)
     {
         return;
     }
@@ -223,18 +223,23 @@ void Genome::mutate_connection()
     {
         Environment::inc_innovation_number();
         gene.innovation(Environment::get_innovation_number());
-        gene.weight(generator_->get_next(2));
+        gene.weight(get_weight());
         genes_.push_back(gene);
     }
+}
+
+float Genome::get_weight()
+{
+    auto min_weight = Parameters::get_instance().min_weight();
+    auto max_weight = Parameters::get_instance().max_weight();
+    auto new_weight = generator_->get_next(max_weight - min_weight) + min_weight;
+    return new_weight;
 }
 
 void Genome::mutate_weight()
 {
     auto& gene = get_random_gene();
-    auto min_weight = Parameters::get_instance().min_weight();
-    auto max_weight = Parameters::get_instance().max_weight();
-    auto coef = generator_->get_next(max_weight - min_weight) + min_weight;
-    gene.weight(gene.weight() * coef);
+    gene.weight(get_weight());
 }
 
 void Genome::mutate()

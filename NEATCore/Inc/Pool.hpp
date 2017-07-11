@@ -27,5 +27,5 @@ public:
 private:
     std::shared_ptr<RandomGenerator> generator_;
     SpeciesVector species_;
-    std::map<int, short> stale_map_;
+    std::map<int, unsigned short> stale_map_;
 };

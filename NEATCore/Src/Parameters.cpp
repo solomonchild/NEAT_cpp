@@ -49,6 +49,7 @@ void Parameters::parse()
     set(P_ENABLE_DISABLE_MUTATION, enable_disable_mutation_chance_);
     set(MIN_WEIGHT, min_weight_);
     set(MAX_WEIGHT, max_weight_);
+    set(STALENESS, staleness_);
 }
 std::vector<std::string> Parameters::get_parameters()
 {
@@ -70,6 +71,7 @@ const std::string Parameters::P_ENABLE_DISABLE_MUTATION = "enable_disable_mutati
 
 const std::string Parameters::MIN_WEIGHT = "min_weight";
 const std::string Parameters::MAX_WEIGHT = "max_weight";
+const std::string Parameters::STALENESS = "staleness";
 
 size_t Parameters::population_size()
 {
@@ -136,6 +138,11 @@ float Parameters::max_weight()
    return max_weight_;
 }
 
+size_t Parameters::staleness()
+{
+   return staleness_;
+}
+
 std::vector<std::string> Parameters::parameters_ = {
     Parameters::LOGGING_DESTINATION,
     Parameters::POPULATION_SIZE,
@@ -151,4 +158,5 @@ std::vector<std::string> Parameters::parameters_ = {
     Parameters::P_ENABLE_DISABLE_MUTATION,
     Parameters::MIN_WEIGHT,
     Parameters::MAX_WEIGHT,
+    Parameters::STALENESS,
 };

@@ -58,6 +58,7 @@ private:
 
     void mutate_weight();
     void mutate_connection();
+    float get_weight();
     using Neurons = std::vector<Neuron>;
     Neuron get_random_neuron(bool notOutput = false);
     Neurons get_neurons();
